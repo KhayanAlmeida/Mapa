@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<title>Mapa de Vistorias - Azul Forte na Rodovia</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #0a0a0a;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Layout responsivo */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+  
+  #sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 45vh;
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  #map {
+    height: 55vh;
+  }
+  
+  .fab-container {
+    bottom: 16px;
+    right: 16px;
+  }
+  
+  .history-modal {
+    width: 90%;
+    right: 5%;
+    left: 5%;
+    bottom: 80px;
+  }
+  
+  .fab-menu {
+    min-width: 180px;
+  }
+  
+  .fab-menu-item {
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+  
+  .stats-list {
+    max-height: 120px;
+  }
+}
+
+#sidebar {
+  width: 360px;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+  color: white;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100vh;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+#sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+#sidebar::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+
+#sidebar::-webkit-scrollbar-thumb {
+  background: #4a9eff;
+  border-radius: 3px;
+}
+
+#sidebar h2 {
+  margin: 0 0 5px 0;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+  padding-bottom: 10px;
+  z-index: 20;
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #333;
+  position: sticky;
+  top: 45px;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+  z-index: 20;
+}
+
+.drop {
+  border: 2px dashed #4a9eff;
+  background: rgba(74, 158, 255, 0.05);
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  margin-top: 5px;
+}
+
+.drop:hover {
+  background: rgba(74, 158, 255, 0.15);
+  border-color: #7bb5ff;
+  transform: translateY(-2px);
+}
+
+.drop:active {
+  transform: translateY(0);
+}
+
+.legend {
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 10px;
+}
+
+.legend h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0;
+  font-size: 13px;
+}
+
+.color-box {
+  width: 32px;
+  height: 18px;
+  border-radius: 6px;
+}
+
+.color-box.green {
+  background: #22c55e;
+  border: 1px solid #4ade80;
+}
+
+.color-box.red {
+  background: #ef4444;
+  border: 1px solid #f87171;
+}
+
+.color-box.blue {
+  background: #0044ff;
+  border: 1px solid #3b82f6;
+  box-shadow: 0 0 4px #0044ff;
+}
+
+.stats-card {
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 10px;
+  display: none;
+}
+
+.stats-card.show {
+  display: block;
+}
+
+.stats-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #4a9eff;
+  border-bottom: 1px solid #333;
+  padding-bottom: 6px;
+}
+
+.stats-list {
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.stats-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.stats-list::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 2px;
+}
+
+.stats-list::-webkit-scrollbar-thumb {
+  background: #4a9eff;
+  border-radius: 2px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+  font-size: 12px;
+  padding: 6px 8px;
+  background: #2a2a2a;
+  border-radius: 8px;
+  transition: all 0.1s;
+}
+
+.stat-item:hover {
+  background: #333;
+  transform: translateX(2px);
+}
+
+.stat-label {
+  color: #ddd;
+  font-weight: 500;
+  font-size: 12px;
+  word-break: break-word;
+  flex: 1;
+}
+
+.stat-value {
+  color: #4a9eff;
+  font-weight: 700;
+  font-size: 13px;
+  margin-left: 8px;
+}
+
+.progress-bar-container {
+  width: 100%;
+  background: #3a3a3a;
+  border-radius: 4px;
+  margin-top: 4px;
+  height: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 4px;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.stat-detail {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #333;
+  font-size: 11px;
+  color: #888;
+  text-align: center;
+}
+
+.file-info {
+  font-size: 10px;
+  color: #4a9eff;
+  margin-top: 4px;
+  padding-left: 8px;
+}
+
+.separator {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #333, transparent);
+  margin: 10px 0;
+}
+
+.warning-badge {
+  background: rgba(245, 158, 11, 0.2);
+  border-left: 3px solid #f59e0b;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  margin-top: 8px;
+  color: #fbbf24;
+}
+
+.history-modal {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 400px;
+  max-height: 70vh;
+  background: #1e1e1e;
+  border-radius: 16px;
+  border-left: 4px solid #0044ff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideIn 0.25s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.history-modal.show {
+  display: flex;
+}
+
+.history-header {
+  background: #0f0f0f;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
+}
+
+.history-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0044ff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.close-history {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 6px;
+  transition: color 0.2s;
+}
+
+.close-history:hover {
+  color: #ff4444;
+}
+
+.history-content {
+  padding: 16px;
+  overflow-y: auto;
+  max-height: 55vh;
+}
+
+.history-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.history-content::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+
+.history-content::-webkit-scrollbar-thumb {
+  background: #0044ff;
+  border-radius: 3px;
+}
+
+.history-item {
+  background: #2a2a2a;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-left: 3px solid #0044ff;
+}
+
+.history-item .date {
+  font-size: 11px;
+  color: #4a9eff;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.history-item .inspector {
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 6px;
+  background: #1e3a8a20;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.history-item .km-range {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 6px;
+}
+
+.history-item .observation {
+  font-size: 12px;
+  color: #ddd;
+  background: #1e1e1e;
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-top: 8px;
+  border-left: 2px solid #f59e0b;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.empty-history {
+  text-align: center;
+  color: #aaa;
+  padding: 24px;
+  font-size: 13px;
+}
+
+.history-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #333;
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+}
+
+#map {
+  flex: 1;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+  background-color: #111;
+}
+
+/* Botão flutuante e menu */
+.fab-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1001;
+}
+
+.fab-button {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #0044ff, #1e40af);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 68, 255, 0.4);
+  transition: all 0.2s ease;
+  border: none;
+  color: white;
+  font-size: 24px;
+}
+
+.fab-button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(0, 68, 255, 0.6);
+}
+
+.fab-menu {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 8px;
+  min-width: 220px;
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  border: 1px solid #333;
+  animation: menuFadeIn 0.2s ease;
+}
+
+.fab-menu.show {
+  display: flex;
+}
+
+@keyframes menuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fab-menu-item {
+  background: #2a2a2a;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: white;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: 'Inter', sans-serif;
+}
+
+.fab-menu-item:hover {
+  background: #3a3a3a;
+  transform: translateX(2px);
+}
+
+.fab-menu-item.danger {
+  color: #f87171;
+}
+
+.fab-menu-item.danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.fab-menu-item.warning {
+  color: #fbbf24;
+}
+
+.fab-menu-item.warning:hover {
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.custom-tooltip {
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid #3b82f6;
+  border-radius: 10px;
+  color: white;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  font-weight: 500;
+}
+
+.custom-tooltip strong {
+  color: #3b82f6;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rodovia-label {
+  background: transparent;
+  border: none;
+}
+
+.rodovia-label div {
+  background: linear-gradient(135deg, #0044ff 0%, #1e40af 100%);
+  backdrop-filter: blur(8px);
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 800;
+  border: 2px solid #60a5fa;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 0 2px rgba(96, 165, 250, 0.3);
+  white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.5px;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  transition: all 0.2s;
+}
+
+.rodovia-label div:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #2266ff 0%, #0055ff 100%);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.5), 0 0 0 2px rgba(96, 165, 250, 0.5);
+}
+
+.info-marker {
+  font-size: 11px;
+  color: #aaa;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.loading {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #fff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.firebase-status {
+  background: rgba(0, 68, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 10px;
+  color: #4a9eff;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.success-badge {
+  color: #22c55e;
+}
+
+.error-badge {
+  color: #ef4444;
+}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div>
+    <h2>🗺️ Mapa de Vistorias</h2>
+    <div class="subtitle">Sistema profissional de análise de rodovias</div>
+  </div>
+
+  <div>
+    <div class="drop" id="geoDrop">
+      📍 Carregar arquivo GEO (Excel)
+    </div>
+    <input type="file" id="geoInput" accept=".xlsx, .xls" style="display:none">
+    <div class="info-marker">
+      📌 Colunas: Rodovia, Km, Latitude, Longitude, Município
+    </div>
+    <div id="geoFileInfo" class="file-info"></div>
+  </div>
+
+  <div>
+    <div class="drop" id="vistDrop">
+      📋 Carregar arquivo VISTORIAS (Excel)
+    </div>
+    <input type="file" id="vistInput" accept=".xlsx, .xls" style="display:none">
+    <div class="info-marker">
+      📌 Colunas: Rodovia, KM Inicial, KM Final, Data, Fiscal, Observações
+    </div>
+    <div id="vistFileInfo" class="file-info"></div>
+  </div>
+
+  <div class="stats-card" id="statsCard">
+    <div class="stats-title">📊 Percentual de Vistoria por Trecho</div>
+    <div id="statsList" class="stats-list">
+      <div style="text-align: center; color: #888; padding: 12px;">Carregue os dados para ver as estatísticas</div>
+    </div>
+    <div class="stat-detail">📌 Clique no nome da rodovia no mapa para ver o histórico completo</div>
+  </div>
+
+  <div class="legend">
+    <h4>🎨 Legenda</h4>
+    <div class="legend-item">
+      <div class="color-box green"></div>
+      <span>Trecho vistoriado</span>
+    </div>
+    <div class="legend-item">
+      <div class="color-box red"></div>
+      <span>Trecho NÃO vistoriado</span>
+    </div>
+    <div class="legend-item">
+      <div class="color-box blue"></div>
+      <span>Rodovia (referência) - AZUL FORTE</span>
+    </div>
+  </div>
+
+  <div class="separator"></div>
+  
+  <div class="firebase-status" id="firebaseStatus">
+    🔄 Conectando ao Firebase...
+  </div>
+</div>
+
+<div id="map"></div>
+
+<div id="historyModal" class="history-modal">
+  <div class="history-header">
+    <h3>📋 Histórico de Vistorias</h3>
+    <button class="close-history" id="closeHistoryBtn">✕</button>
+  </div>
+  <div id="historyContent" class="history-content">
+    <div class="empty-history">Selecione uma rodovia no mapa</div>
+  </div>
+  <div class="history-footer">
+    Clique no nome da rodovia para ver o histórico completo
+  </div>
+</div>
+
+<!-- Botão flutuante com menu -->
+<div class="fab-container">
+  <button class="fab-button" id="fabButton">
+    ⚙️
+  </button>
+  <div class="fab-menu" id="fabMenu">
+    <button class="fab-menu-item" id="fabMapToggle">
+      🛰️ Alternar modo de mapa
+    </button>
+    <button class="fab-menu-item warning" id="fabClearGeo">
+      🗑️ Remover dados GEO
+    </button>
+    <button class="fab-menu-item danger" id="fabClearVist">
+      📋 Remover dados VISTORIAS
+    </button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+// Configuração do Firebase - INTEGRADO COM SEU PROJETO
+const firebaseConfig = {
+  apiKey: "AIzaSyC_G088HNpNpsOXnix3MRSJtRbXnN4jLng",
+  authDomain: "mapa-765c8.firebaseapp.com",
+  projectId: "mapa-765c8",
+  storageBucket: "mapa-765c8.firebasestorage.app",
+  messagingSenderId: "327920206609",
+  appId: "1:327920206609:web:a7355eac0bc01c045182b0",
+  measurementId: "G-211YRL1G4C"
+};
+
+// Inicializar Firebase
+let db;
+let firebaseInitialized = false;
+
+try {
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  db = firebase.firestore();
+  firebaseInitialized = true;
+  document.getElementById("firebaseStatus").innerHTML = "✅ Firebase conectado com sucesso! | Dados sincronizados na nuvem";
+  console.log("Firebase inicializado com sucesso!");
+} catch (error) {
+  console.warn("Erro ao conectar Firebase:", error);
+  document.getElementById("firebaseStatus").innerHTML = "⚠️ Modo offline - Dados salvos localmente";
+}
+
+// Inicializar o mapa
+const map = L.map('map').setView([-23.5, -47.4], 8);
+
+// Configurar camadas
+const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { 
+  attribution: 'Tiles &copy; Esri', 
+  maxZoom: 19 
+});
+
+const labelsLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { 
+  attribution: '&copy; CARTO', 
+  subdomains: 'abcd', 
+  maxZoom: 19, 
+  opacity: 0.85 
+});
+
+const streetLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+  attribution: '&copy; CARTO', 
+  subdomains: 'abcd', 
+  maxZoom: 19 
+});
+
+let currentLayer = 'street';
+let currentTileLayer = streetLayer;
+let currentLabelsLayer = null;
+currentTileLayer.addTo(map);
+
+let geoData = [];
+let vistoriaData = [];
+let segmentos = [];
+let todasAsLinhas = [];
+let marcadoresRodovia = [];
+let historicoPorRodovia = {};
+let estatisticasPorTrecho = {};
+
+let geoFileName = "", vistFileName = "";
+let pontosIgnorados = 0;
+
+const statsCard = document.getElementById("statsCard");
+const statsListDiv = document.getElementById("statsList");
+const geoFileInfo = document.getElementById("geoFileInfo");
+const vistFileInfo = document.getElementById("vistFileInfo");
+const historyModal = document.getElementById("historyModal");
+const historyContent = document.getElementById("historyContent");
+const closeHistoryBtn = document.getElementById("closeHistoryBtn");
+
+// Elementos do FAB
+const fabButton = document.getElementById("fabButton");
+const fabMenu = document.getElementById("fabMenu");
+const fabMapToggle = document.getElementById("fabMapToggle");
+const fabClearGeo = document.getElementById("fabClearGeo");
+const fabClearVist = document.getElementById("fabClearVist");
+
+// Funções de armazenamento Firebase
+async function salvarGeoFirebase(data, fileName) {
+  if (!firebaseInitialized) {
+    localStorage.setItem('geoData', JSON.stringify({ data, fileName, timestamp: new Date().toISOString() }));
+    return;
+  }
+  try {
+    // Certificar que a coleção existe
+    await db.collection('mapa_vistorias').doc('geo_data').set({
+      data: data,
+      fileName: fileName,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    console.log('✅ Dados GEO salvos no Firebase com sucesso!');
+    document.getElementById("firebaseStatus").innerHTML = "✅ Dados GEO salvos na nuvem!";
+    setTimeout(() => {
+      document.getElementById("firebaseStatus").innerHTML = "✅ Firebase conectado | Dados sincronizados";
+    }, 3000);
+  } catch (error) {
+    console.error('❌ Erro ao salvar GEO:', error);
+    localStorage.setItem('geoData', JSON.stringify({ data, fileName, timestamp: new Date().toISOString() }));
+    document.getElementById("firebaseStatus").innerHTML = "⚠️ Erro ao salvar na nuvem - Dados salvos localmente";
+  }
+}
+
+async function salvarVistoriaFirebase(data, fileName) {
+  if (!firebaseInitialized) {
+    localStorage.setItem('vistoriaData', JSON.stringify({ data, fileName, timestamp: new Date().toISOString() }));
+    return;
+  }
+  try {
+    await db.collection('mapa_vistorias').doc('vistoria_data').set({
+      data: data,
+      fileName: fileName,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    console.log('✅ Dados de vistoria salvos no Firebase com sucesso!');
+    document.getElementById("firebaseStatus").innerHTML = "✅ Dados de Vistoria salvos na nuvem!";
+    setTimeout(() => {
+      document.getElementById("firebaseStatus").innerHTML = "✅ Firebase conectado | Dados sincronizados";
+    }, 3000);
+  } catch (error) {
+    console.error('❌ Erro ao salvar vistoria:', error);
+    localStorage.setItem('vistoriaData', JSON.stringify({ data, fileName, timestamp: new Date().toISOString() }));
+    document.getElementById("firebaseStatus").innerHTML = "⚠️ Erro ao salvar na nuvem - Dados salvos localmente";
+  }
+}
+
+async function carregarGeoFirebase() {
+  if (firebaseInitialized) {
+    try {
+      const doc = await db.collection('mapa_vistorias').doc('geo_data').get();
+      if (doc.exists) {
+        const { data, fileName } = doc.data();
+        console.log('✅ Dados GEO carregados do Firebase:', fileName);
+        return { data, fileName };
+      }
+    } catch (error) {
+      console.error('❌ Erro ao carregar GEO do Firebase:', error);
+    }
+  }
+  const local = localStorage.getItem('geoData');
+  if (local) {
+    const { data, fileName } = JSON.parse(local);
+    console.log('📁 Dados GEO carregados do armazenamento local');
+    return { data, fileName };
+  }
+  return null;
+}
+
+async function carregarVistoriaFirebase() {
+  if (firebaseInitialized) {
+    try {
+      const doc = await db.collection('mapa_vistorias').doc('vistoria_data').get();
+      if (doc.exists) {
+        const { data, fileName } = doc.data();
+        console.log('✅ Dados de vistoria carregados do Firebase:', fileName);
+        return { data, fileName };
+      }
+    } catch (error) {
+      console.error('❌ Erro ao carregar vistoria do Firebase:', error);
+    }
+  }
+  const local = localStorage.getItem('vistoriaData');
+  if (local) {
+    const { data, fileName } = JSON.parse(local);
+    console.log('📁 Dados de vistoria carregados do armazenamento local');
+    return { data, fileName };
+  }
+  return null;
+}
+
+async function removerGeoFirebase() {
+  if (firebaseInitialized) {
+    try {
+      await db.collection('mapa_vistorias').doc('geo_data').delete();
+      console.log('✅ Dados GEO removidos do Firebase');
+    } catch (error) {
+      console.error('❌ Erro ao remover GEO do Firebase:', error);
+    }
+  }
+  localStorage.removeItem('geoData');
+}
+
+async function removerVistoriaFirebase() {
+  if (firebaseInitialized) {
+    try {
+      await db.collection('mapa_vistorias').doc('vistoria_data').delete();
+      console.log('✅ Dados de vistoria removidos do Firebase');
+    } catch (error) {
+      console.error('❌ Erro ao remover vistoria do Firebase:', error);
+    }
+  }
+  localStorage.removeItem('vistoriaData');
+}
+
+// Carregar dados salvos ao iniciar
+async function carregarDadosSalvos() {
+  showLoading(true);
+  console.log("🔄 Carregando dados salvos...");
+  
+  const geoSaved = await carregarGeoFirebase();
+  if (geoSaved && geoSaved.data && geoSaved.data.length > 0) {
+    geoData = geoSaved.data;
+    geoFileName = geoSaved.fileName;
+    geoFileInfo.innerHTML = `📄 ${geoFileName} (${geoData.length} pontos) - Carregado do banco`;
+    pontosIgnorados = 0;
+    clearMapLayers();
+    desenhar();
+    console.log("📊 Dados GEO carregados:", geoData.length, "pontos");
+  }
+  
+  const vistSaved = await carregarVistoriaFirebase();
+  if (vistSaved && vistSaved.data && vistSaved.data.length > 0) {
+    vistoriaData = vistSaved.data;
+    vistFileName = vistSaved.fileName;
+    vistFileInfo.innerHTML = `📄 ${vistFileName} (${vistoriaData.length} registros) - Carregado do banco`;
+    processarHistoricoVistorias();
+    if (geoData.length > 0 && segmentos.length > 0) {
+      pintar();
+    }
+    console.log("📋 Dados de vistoria carregados:", vistoriaData.length, "registros");
+  }
+  
+  showLoading(false);
+}
+
+function processarHistoricoVistorias() {
+  historicoPorRodovia = {};
+  
+  for (let v of vistoriaData) {
+    let rodovia = v["Rodovia"] || v["rodovia"] || v["RODOVIA"];
+    if (!rodovia) continue;
+    
+    let kmInicial = v["KM Inicial"] || v["Km Inicial"] || v["KM_INICIAL"] || v["km_inicial"] || v["KMINICIAL"] || 0;
+    let kmFinal = v["KM Final"] || v["Km Final"] || v["KM_FINAL"] || v["km_final"] || v["KMFINAL"] || 0;
+    let dataVist = v["Data"] || v["data"] || v["DATA"] || "Data não informada";
+    let fiscal = v["Fiscal"] || v["fiscal"] || v["FISCAL"] || v["Fiscal Responsável"] || "Não informado";
+    let observacao = v["Observações"] || v["Observacao"] || v["Observação"] || v["obs"] || v["OBS"] || "Sem observações";
+    
+    if (!historicoPorRodovia[rodovia]) {
+      historicoPorRodovia[rodovia] = [];
+    }
+    
+    historicoPorRodovia[rodovia].push({ 
+      data: String(dataVist), 
+      fiscal: String(fiscal), 
+      kmInicial: Number(kmInicial), 
+      kmFinal: Number(kmFinal), 
+      observacao: String(observacao)
+    });
+  }
+  
+  for (let rod in historicoPorRodovia) {
+    historicoPorRodovia[rod].sort((a, b) => {
+      let da = new Date(a.data);
+      let db = new Date(b.data);
+      if (isNaN(da) || isNaN(db)) return 0;
+      return db - da;
+    });
+  }
+  
+  console.log("📋 Histórico processado:", Object.keys(historicoPorRodovia).length, "rodovias");
+}
+
+function showLoading(show) {
+  if (show) {
+    if (!document.querySelector('.loading')) {
+      const loadingSpan = document.createElement('span');
+      loadingSpan.className = 'loading';
+      document.body.appendChild(loadingSpan);
+      loadingSpan.style.position = 'fixed';
+      loadingSpan.style.top = '20px';
+      loadingSpan.style.right = '20px';
+      loadingSpan.style.zIndex = '10000';
+    }
+  } else {
+    const loading = document.querySelector('.loading');
+    if (loading) loading.remove();
+  }
+}
+
+function getColumnValue(row, possibleNames) {
+  for (let name of possibleNames) {
+    if (row[name] !== undefined && row[name] !== null && String(row[name]).trim() !== "") return row[name];
+    for (let key in row) {
+      if (key.toLowerCase() === name.toLowerCase() && row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== "") return row[key];
+    }
+  }
+  return null;
+}
+
+function isInexistente(valor) {
+  if (!valor) return false;
+  const strValor = String(valor).toLowerCase().trim();
+  return strValor === 'inexistente' || strValor.includes('inexistente') || strValor === 'não existe' || strValor === 'nao existe';
+}
+
+function dmsToDecimal(dms) {
+  if (!dms) return null;
+  if (isInexistente(dms)) return null;
+  if (typeof dms !== 'string') dms = String(dms);
+  dms = dms.trim();
+  const asNumber = parseFloat(dms);
+  if (!isNaN(asNumber) && dms.indexOf('°') === -1 && dms.indexOf("'") === -1) return asNumber;
+  const regex = /(\d+)°\s*(\d+)'([\d.]+)"([NSEWO])/i;
+  const match = dms.match(regex);
+  if (!match) return null;
+  let degrees = parseFloat(match[1]), minutes = parseFloat(match[2]), seconds = parseFloat(match[3]);
+  let direction = match[4].toUpperCase();
+  let decimal = degrees + minutes/60 + seconds/3600;
+  if (direction === "S" || direction === "O" || direction === "W") decimal *= -1;
+  return decimal;
+}
+
+function clearMapLayers() {
+  todasAsLinhas.forEach(layer => { if (layer && map.hasLayer(layer)) map.removeLayer(layer); });
+  marcadoresRodovia.forEach(marker => { if (marker && map.hasLayer(marker)) map.removeLayer(marker); });
+  todasAsLinhas = [];
+  marcadoresRodovia = [];
+}
+
+async function clearGeoOnly() {
+  if (geoData.length === 0 && segmentos.length === 0) return;
+  geoData = []; 
+  segmentos = []; 
+  geoFileName = ""; 
+  geoFileInfo.innerHTML = ""; 
+  pontosIgnorados = 0;
+  clearMapLayers();
+  atualizarEstatisticasUI();
+  historyModal.classList.remove('show');
+  fabMenu.classList.remove('show');
+  await removerGeoFirebase();
+  console.log("🗑️ Dados GEO removidos");
+}
+
+async function clearVistOnly() {
+  if (vistoriaData.length === 0) return;
+  vistoriaData = []; 
+  vistFileName = ""; 
+  vistFileInfo.innerHTML = ""; 
+  historicoPorRodovia = {};
+  if (geoData.length > 0) { 
+    clearMapLayers(); 
+    desenhar(); 
+  } else { 
+    clearMapLayers(); 
+    estatisticasPorTrecho = {}; 
+    atualizarEstatisticasUI(); 
+  }
+  historyModal.classList.remove('show');
+  fabMenu.classList.remove('show');
+  await removerVistoriaFirebase();
+  console.log("🗑️ Dados de vistoria removidos");
+}
+
+function lerExcel(file, callback, tipo) {
+  if (!file) return;
+  const extension = file.name.split('.').pop().toLowerCase();
+  if (extension !== 'xlsx' && extension !== 'xls') {
+    alert('Por favor, carregue um arquivo Excel (.xlsx ou .xls)');
+    return;
+  }
+  showLoading(true);
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json(sheet);
+      if (!json || json.length === 0) throw new Error("Arquivo vazio");
+      
+      console.log(`📂 Arquivo ${tipo} carregado:`, json.length, "registros");
+      console.log("📄 Primeiro registro:", json[0]);
+      
+      callback(json, file.name);
+    } catch (err) { 
+      console.error(err);
+      alert('Erro ao ler o arquivo: ' + err.message);
+    }
+    finally { showLoading(false); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function setupInput(dropId, inputId, callback, tipo) {
+  const drop = document.getElementById(dropId), input = document.getElementById(inputId);
+  if (!drop || !input) return;
+  drop.onclick = () => input.click();
+  input.onchange = e => { if (e.target.files && e.target.files[0]) callback(e.target.files[0], tipo); };
+  drop.ondragover = e => e.preventDefault();
+  drop.ondrop = e => { 
+    e.preventDefault(); 
+    const file = e.dataTransfer.files[0]; 
+    if (file) callback(file, tipo); 
+  };
+}
+
+async function loadGeo(file, tipo) {
+  lerExcel(file, async (data, fileName) => {
+    geoData = data;
+    geoFileName = fileName;
+    segmentos = [];
+    pontosIgnorados = 0;
+    clearMapLayers();
+    desenhar();
+    await salvarGeoFirebase(data, fileName);
+    geoFileInfo.innerHTML = `📄 ${fileName} (${data.length} pontos) - Salvo no banco`;
+    if (pontosIgnorados > 0) geoFileInfo.innerHTML += `<div class="warning-badge">⚠️ ${pontosIgnorados} pontos ignorados</div>`;
+  }, tipo);
+}
+
+async function loadVistoria(file, tipo) {
+  lerExcel(file, async (data, fileName) => {
+    vistoriaData = data;
+    vistFileName = fileName;
+    processarHistoricoVistorias();
+    await salvarVistoriaFirebase(data, fileName);
+    vistFileInfo.innerHTML = `📄 ${fileName} (${data.length} registros) - Salvo no banco`;
+    
+    if (geoData.length > 0) {
+      if (segmentos.length > 0) {
+        pintar();
+      } else {
+        clearMapLayers();
+        desenhar();
+      }
+    }
+  }, tipo);
+}
+
+function mostrarHistorico(rodovia, municipio = "") {
+  let nomeExibicao = municipio ? `${rodovia} - ${municipio}` : rodovia;
+  const historico = historicoPorRodovia[rodovia] || [];
+  
+  if (historico.length === 0) {
+    historyContent.innerHTML = `<div class="empty-history">📭 Nenhum registro de vistoria para ${nomeExibicao}</div>`;
+  } else {
+    historyContent.innerHTML = historico.map(item => `
+      <div class="history-item">
+        <div class="date">📅 ${item.data}</div>
+        <div class="inspector">👤 Fiscal: ${item.fiscal}</div>
+        <div class="km-range">📍 Trecho vistoriado: Km ${Number(item.kmInicial).toFixed(2)} - ${Number(item.kmFinal).toFixed(2)}</div>
+        <div class="observation">📝 Observações: ${item.observacao}</div>
+      </div>
+    `).join('');
+  }
+  historyModal.classList.add('show');
+}
+
+closeHistoryBtn.onclick = () => historyModal.classList.remove('show');
+window.onclick = (e) => { if (e.target === historyModal) historyModal.classList.remove('show'); };
+
+function atualizarEstatisticasUI() {
+  const trechos = Object.keys(estatisticasPorTrecho);
+  if (trechos.length === 0) {
+    statsListDiv.innerHTML = '<div style="text-align: center; color: #888; padding: 12px;">Nenhum trecho carregado</div>';
+    statsCard.classList.remove('show');
+    return;
+  }
+  statsCard.classList.add('show');
+  trechos.sort();
+  statsListDiv.innerHTML = trechos.map(trecho => {
+    const stats = estatisticasPorTrecho[trecho];
+    const percentual = stats.percentual.toFixed(1);
+    const corBarra = stats.percentual >= 80 ? '#22c55e' : (stats.percentual >= 50 ? '#f59e0b' : '#ef4444');
+    return `
+      <div class="stat-item">
+        <div style="flex: 1;">
+          <div class="stat-label">${trecho}</div>
+          <div class="progress-bar-container"><div class="progress-bar" style="width: ${stats.percentual}%; background: ${corBarra};"></div></div>
+        </div>
+        <div class="stat-value">${percentual}%</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function desenhar() {
+  if (!geoData || geoData.length === 0) return;
+  
+  const pontosPorTrecho = {};
+  let pontosValidos = 0, pontosInvalidos = 0;
+  
+  geoData.forEach(l => {
+    const rodovia = l["Rodovia"] || l["rodovia"];
+    let municipio = l["Município"] || l["Municipio"] || l["municipio"] || "";
+    if (municipio) municipio = String(municipio).trim();
+    const km = Number(l["Km"] || l["km"]);
+    let lat = l["Latitude"], lng = l["Longitude"];
+    if (isInexistente(lat) || isInexistente(lng)) { pontosInvalidos++; return; }
+    lat = dmsToDecimal(lat); lng = dmsToDecimal(lng);
+    if (!rodovia || isNaN(km) || lat === null || lng === null) { pontosInvalidos++; return; }
+    pontosValidos++;
+    let chaveTrecho = municipio ? `${rodovia} - ${municipio}` : rodovia;
+    if (!pontosPorTrecho[chaveTrecho]) pontosPorTrecho[chaveTrecho] = [];
+    pontosPorTrecho[chaveTrecho].push({ km, lat, lng, rodoviaOriginal: rodovia, municipio });
+  });
+  pontosIgnorados = pontosInvalidos;
+  if (pontosValidos === 0) return;
+  
+  const bounds = [];
+  const novosSegmentos = [];
+  
+  for (let nomeTrecho in pontosPorTrecho) {
+    const pontos = pontosPorTrecho[nomeTrecho].sort((a, b) => a.km - b.km);
+    const coordsLinha = pontos.map(p => [p.lat, p.lng]);
+    
+    const linhaReferencia = L.polyline(coordsLinha, { 
+      color: "#0044ff", 
+      weight: 6, 
+      opacity: 1, 
+      lineCap: 'round', 
+      lineJoin: 'round' 
+    }).addTo(map);
+    todasAsLinhas.push(linhaReferencia);
+    coordsLinha.forEach(coord => bounds.push(coord));
+    
+    if (pontos.length > 0) {
+      const meio = Math.floor(pontos.length / 2);
+      const rodoviaNome = pontos[meio].rodoviaOriginal;
+      const municipioNome = pontos[meio].municipio || "";
+      let textoBotao = municipioNome ? `${rodoviaNome}<br><span style="font-size:9px; opacity:0.9;">${municipioNome}</span>` : rodoviaNome;
+      const icon = L.divIcon({ 
+        className: 'rodovia-label', 
+        html: `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">${textoBotao}</div>`,
+        iconSize: municipioNome ? [130, 46] : [100, 36],
+        iconAnchor: municipioNome ? [65, 23] : [50, 18]
+      });
+      const marker = L.marker([pontos[meio].lat, pontos[meio].lng], { icon: icon, zIndexOffset: 1000 }).addTo(map);
+      marker.on('click', () => mostrarHistorico(rodoviaNome, municipioNome));
+      marcadoresRodovia.push(marker);
+    }
+    
+    for (let i = 0; i < pontos.length - 1; i++) {
+      novosSegmentos.push({
+        nomeTrecho: nomeTrecho,
+        rodoviaOriginal: pontos[i].rodoviaOriginal,
+        kmInicio: pontos[i].km,
+        kmFim: pontos[i+1].km,
+        coords: [[pontos[i].lat, pontos[i].lng], [pontos[i+1].lat, pontos[i+1].lng]],
+        layer: null
+      });
+    }
+  }
+  segmentos = novosSegmentos;
+  if (bounds.length > 0) map.fitBounds(bounds);
+  
+  if (vistoriaData.length > 0) pintar();
+  else {
+    estatisticasPorTrecho = {};
+    for (let trecho in pontosPorTrecho) estatisticasPorTrecho[trecho] = { total: 0, vistoriados: 0, percentual: 0 };
+    atualizarEstatisticasUI();
+  }
+}
+
+function pintar() {
+  if (segmentos.length === 0) return;
+  
+  segmentos.forEach(seg => { 
+    if (seg.layer && map.hasLayer(seg.layer)) { 
+      map.removeLayer(seg.layer); 
+      const idx = todasAsLinhas.indexOf(seg.layer); 
+      if (idx !== -1) todasAsLinhas.splice(idx, 1); 
+    } 
+  });
+  
+  const contagemPorTrecho = {};
+  const vistoriadosPorTrecho = {};
+  
+  segmentos.forEach(seg => {
+    if (!contagemPorTrecho[seg.nomeTrecho]) { 
+      contagemPorTrecho[seg.nomeTrecho] = 0; 
+      vistoriadosPorTrecho[seg.nomeTrecho] = 0; 
+    }
+    contagemPorTrecho[seg.nomeTrecho]++;
+  });
+  
+  segmentos.forEach(seg => {
+    let vistoriado = false;
+    
+    for (let v of vistoriaData) {
+      let rod = v["Rodovia"] || v["rodovia"] || v["RODOVIA"];
+      let ki = v["KM Inicial"] || v["Km Inicial"] || v["KM_INICIAL"];
+      let kf = v["KM Final"] || v["Km Final"] || v["KM_FINAL"];
+      
+      if (ki === undefined || kf === undefined) continue;
+      
+      ki = Number(ki);
+      kf = Number(kf);
+      
+      if (isNaN(ki) || isNaN(kf)) continue;
+      
+      if (rod === seg.rodoviaOriginal && seg.kmInicio >= ki && seg.kmFim <= kf) { 
+        vistoriado = true; 
+        break; 
+      }
+    }
+    
+    if (vistoriado) vistoriadosPorTrecho[seg.nomeTrecho]++;
+    
+    const line = L.polyline(seg.coords, { 
+      color: vistoriado ? "#22c55e" : "#ef4444", 
+      weight: 5, 
+      opacity: 0.85, 
+      lineCap: 'round', 
+      lineJoin: 'round' 
+    }).addTo(map);
+    
+    line.bindTooltip(`<strong>${seg.nomeTrecho}</strong><br>📍 Km ${seg.kmInicio.toFixed(3)} - ${seg.kmFim.toFixed(3)}<br>${vistoriado ? '✅ VISTORIADO' : '❌ NÃO VISTORIADO'}`, 
+      { sticky: true, className: 'custom-tooltip' });
+    
+    todasAsLinhas.push(line);
+    seg.layer = line;
+  });
+  
+  estatisticasPorTrecho = {};
+  for (let trecho in contagemPorTrecho) {
+    const total = contagemPorTrecho[trecho];
+    const vist = vistoriadosPorTrecho[trecho] || 0;
+    estatisticasPorTrecho[trecho] = { 
+      total, 
+      vistoriados: vist, 
+      percentual: total > 0 ? (vist / total) * 100 : 0 
+    };
+  }
+  atualizarEstatisticasUI();
+}
+
+function toggleMapLayer() {
+  if (currentLayer === 'street') {
+    map.removeLayer(currentTileLayer);
+    if (currentLabelsLayer) map.removeLayer(currentLabelsLayer);
+    satelliteLayer.addTo(map); 
+    labelsLayer.addTo(map);
+    currentTileLayer = satelliteLayer; 
+    currentLabelsLayer = labelsLayer; 
+    currentLayer = 'satellite';
+    fabMapToggle.innerHTML = '🗺️ Modo Mapa';
+  } else {
+    map.removeLayer(currentTileLayer);
+    if (currentLabelsLayer) map.removeLayer(currentLabelsLayer);
+    streetLayer.addTo(map);
+    currentTileLayer = streetLayer; 
+    currentLabelsLayer = null; 
+    currentLayer = 'street';
+    fabMapToggle.innerHTML = '🛰️ Modo Satélite';
+  }
+  fabMenu.classList.remove('show');
+}
+
+// Toggle do menu flutuante
+fabButton.addEventListener("click", (e) => {
+  e.stopPropagation();
+  fabMenu.classList.toggle("show");
+});
+
+document.addEventListener("click", (e) => {
+  if (!fabButton.contains(e.target) && !fabMenu.contains(e.target)) {
+    fabMenu.classList.remove("show");
+  }
+});
+
+// Configurar inputs
+setupInput("geoDrop", "geoInput", loadGeo, 'geo');
+setupInput("vistDrop", "vistInput", loadVistoria, 'vist');
+
+// Configurar ações do menu flutuante
+fabMapToggle.addEventListener("click", toggleMapLayer);
+fabClearGeo.addEventListener("click", clearGeoOnly);
+fabClearVist.addEventListener("click", clearVistOnly);
+
+// Carregar dados salvos ao iniciar
+carregarDadosSalvos();
+
+console.log("🚀 Sistema inicializado com sucesso!");
+console.log("📊 Firebase configurado com o projeto:", firebaseConfig.projectId);
+</script>
+</body>
+</html>
