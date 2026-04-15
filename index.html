@@ -25,22 +25,103 @@ body {
   overflow: hidden;
 }
 
-/* Layout responsivo */
+/* Sidebar - Desktop (padrão) */
+#sidebar {
+  width: 360px;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+  color: white;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100vh;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+  z-index: 10;
+  flex-shrink: 0;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Botão toggle para celular - visível apenas em mobile */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: linear-gradient(135deg, #0044ff, #1e40af);
+  border: none;
+  color: white;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 24px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  transition: all 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #2266ff, #0055ff);
+}
+
+/* Overlay para fechar sidebar no celular */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9;
+  transition: opacity 0.3s ease;
+}
+
+/* Responsivo - Celular */
 @media (max-width: 768px) {
   body {
     flex-direction: column;
   }
   
+  /* Sidebar oculta por padrão no celular */
   #sidebar {
-    width: 100%;
-    height: auto;
-    max-height: 45vh;
-    padding: 16px;
-    gap: 12px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 85%;
+    max-width: 320px;
+    height: 100vh;
+    transform: translateX(-100%);
+    z-index: 1000;
+    box-shadow: none;
+  }
+  
+  #sidebar.open {
+    transform: translateX(0);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+  }
+  
+  /* Botão toggle visível no celular */
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .sidebar-overlay {
+    display: block;
+  }
+  
+  .sidebar-overlay.hidden {
+    display: none;
   }
   
   #map {
-    height: 55vh;
+    height: 100vh;
+    width: 100%;
   }
   
   .fab-container {
@@ -67,22 +148,25 @@ body {
   .stats-list {
     max-height: 120px;
   }
-}
-
-#sidebar {
-  width: 360px;
-  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-  color: white;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: 100vh;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
-  z-index: 10;
-  flex-shrink: 0;
+  
+  /* Ajustes de padding no sidebar para mobile */
+  #sidebar {
+    padding: 20px 16px;
+    gap: 16px;
+  }
+  
+  #sidebar h2 {
+    font-size: 1.3rem;
+  }
+  
+  .drop {
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .legend-item {
+    font-size: 12px;
+  }
 }
 
 #sidebar::-webkit-scrollbar {
@@ -656,6 +740,13 @@ body {
 </head>
 <body>
 
+<!-- Botão toggle para abrir/fechar sidebar no celular -->
+<button class="sidebar-toggle" id="sidebarToggle">
+  ☰
+</button>
+
+<div class="sidebar-overlay hidden" id="sidebarOverlay"></div>
+
 <div id="sidebar">
   <div>
     <h2>🗺️ Mapa de Vistorias</h2>
@@ -765,6 +856,74 @@ const firebaseConfig = {
   measurementId: "G-211YRL1G4C"
 };
 
+// Controle da sidebar para mobile
+const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+let isMobile = window.innerWidth <= 768;
+
+function checkMobile() {
+  isMobile = window.innerWidth <= 768;
+  if (!isMobile) {
+    // Em desktop, sidebar sempre visível
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.add('hidden');
+  }
+}
+
+function openSidebar() {
+  if (isMobile) {
+    sidebar.classList.add('open');
+    sidebarOverlay.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeSidebar() {
+  if (isMobile) {
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+}
+
+function toggleSidebar() {
+  if (sidebar.classList.contains('open')) {
+    closeSidebar();
+  } else {
+    openSidebar();
+  }
+}
+
+// Eventos da sidebar mobile
+if (sidebarToggle) {
+  sidebarToggle.addEventListener('click', toggleSidebar);
+}
+
+if (sidebarOverlay) {
+  sidebarOverlay.addEventListener('click', closeSidebar);
+}
+
+// Fechar sidebar ao clicar em qualquer link/drop dentro dela (opcional)
+const sidebarElements = sidebar.querySelectorAll('.drop, .fab-menu-item, .clear-btn, .clear-geo-btn, .map-toggle');
+sidebarElements.forEach(el => {
+  el.addEventListener('click', () => {
+    if (isMobile) {
+      setTimeout(closeSidebar, 300);
+    }
+  });
+});
+
+// Detectar mudança de tamanho da tela
+window.addEventListener('resize', () => {
+  checkMobile();
+  if (!isMobile && sidebar.classList.contains('open')) {
+    closeSidebar();
+  }
+});
+
+checkMobile();
+
 // Inicializar Firebase
 let db;
 let firebaseInitialized = false;
@@ -842,7 +1001,6 @@ async function salvarGeoFirebase(data, fileName) {
     return;
   }
   try {
-    // Certificar que a coleção existe
     await db.collection('mapa_vistorias').doc('geo_data').set({
       data: data,
       fileName: fileName,
@@ -1090,6 +1248,7 @@ async function clearGeoOnly() {
   fabMenu.classList.remove('show');
   await removerGeoFirebase();
   console.log("🗑️ Dados GEO removidos");
+  if (isMobile) closeSidebar();
 }
 
 async function clearVistOnly() {
@@ -1110,6 +1269,7 @@ async function clearVistOnly() {
   fabMenu.classList.remove('show');
   await removerVistoriaFirebase();
   console.log("🗑️ Dados de vistoria removidos");
+  if (isMobile) closeSidebar();
 }
 
 function lerExcel(file, callback, tipo) {
@@ -1145,7 +1305,10 @@ function lerExcel(file, callback, tipo) {
 function setupInput(dropId, inputId, callback, tipo) {
   const drop = document.getElementById(dropId), input = document.getElementById(inputId);
   if (!drop || !input) return;
-  drop.onclick = () => input.click();
+  drop.onclick = () => {
+    input.click();
+    if (isMobile) closeSidebar();
+  };
   input.onchange = e => { if (e.target.files && e.target.files[0]) callback(e.target.files[0], tipo); };
   drop.ondragover = e => e.preventDefault();
   drop.ondrop = e => { 
@@ -1205,6 +1368,7 @@ function mostrarHistorico(rodovia, municipio = "") {
     `).join('');
   }
   historyModal.classList.add('show');
+  if (isMobile) closeSidebar();
 }
 
 closeHistoryBtn.onclick = () => historyModal.classList.remove('show');
@@ -1406,6 +1570,7 @@ function toggleMapLayer() {
     fabMapToggle.innerHTML = '🛰️ Modo Satélite';
   }
   fabMenu.classList.remove('show');
+  if (isMobile) closeSidebar();
 }
 
 // Toggle do menu flutuante
