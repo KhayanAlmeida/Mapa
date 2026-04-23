@@ -25,7 +25,6 @@ body {
   overflow: hidden;
 }
 
-/* Sidebar - Desktop (padrão) */
 #sidebar {
   width: 360px;
   background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
@@ -43,7 +42,6 @@ body {
   transition: transform 0.3s ease-in-out;
 }
 
-/* Botão toggle para celular - visível apenas em mobile */
 .sidebar-toggle {
   display: none;
   position: fixed;
@@ -62,12 +60,6 @@ body {
   transition: all 0.2s ease;
 }
 
-.sidebar-toggle:hover {
-  transform: scale(1.05);
-  background: linear-gradient(135deg, #2266ff, #0055ff);
-}
-
-/* Overlay para fechar sidebar no celular */
 .sidebar-overlay {
   display: none;
   position: fixed;
@@ -77,16 +69,13 @@ body {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 9;
-  transition: opacity 0.3s ease;
 }
 
-/* Responsivo - Celular */
 @media (max-width: 768px) {
   body {
     flex-direction: column;
   }
   
-  /* Sidebar oculta por padrão no celular */
   #sidebar {
     position: fixed;
     top: 0;
@@ -104,7 +93,6 @@ body {
     box-shadow: 2px 0 10px rgba(0,0,0,0.5);
   }
   
-  /* Botão toggle visível no celular */
   .sidebar-toggle {
     display: flex;
     align-items: center;
@@ -140,32 +128,13 @@ body {
     min-width: 180px;
   }
   
-  .fab-menu-item {
-    padding: 10px 14px;
-    font-size: 12px;
-  }
-  
   .stats-list {
     max-height: 120px;
   }
   
-  /* Ajustes de padding no sidebar para mobile */
   #sidebar {
     padding: 20px 16px;
     gap: 16px;
-  }
-  
-  #sidebar h2 {
-    font-size: 1.3rem;
-  }
-  
-  .drop {
-    padding: 12px;
-    font-size: 14px;
-  }
-  
-  .legend-item {
-    font-size: 12px;
   }
 }
 
@@ -203,10 +172,6 @@ body {
   margin-bottom: 15px;
   padding-bottom: 8px;
   border-bottom: 1px solid #333;
-  position: sticky;
-  top: 45px;
-  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-  z-index: 20;
 }
 
 .drop {
@@ -225,10 +190,6 @@ body {
   background: rgba(74, 158, 255, 0.15);
   border-color: #7bb5ff;
   transform: translateY(-2px);
-}
-
-.drop:active {
-  transform: translateY(0);
 }
 
 .legend {
@@ -301,20 +262,6 @@ body {
   padding-right: 4px;
 }
 
-.stats-list::-webkit-scrollbar {
-  width: 4px;
-}
-
-.stats-list::-webkit-scrollbar-track {
-  background: #2a2a2a;
-  border-radius: 2px;
-}
-
-.stats-list::-webkit-scrollbar-thumb {
-  background: #4a9eff;
-  border-radius: 2px;
-}
-
 .stat-item {
   display: flex;
   justify-content: space-between;
@@ -360,15 +307,6 @@ body {
   height: 4px;
   border-radius: 4px;
   transition: width 0.3s;
-}
-
-.stat-detail {
-  margin-top: 12px;
-  padding-top: 8px;
-  border-top: 1px solid #333;
-  font-size: 11px;
-  color: #888;
-  text-align: center;
 }
 
 .file-info {
@@ -440,9 +378,6 @@ body {
   font-weight: 700;
   color: #0044ff;
   margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .close-history {
@@ -465,19 +400,6 @@ body {
   max-height: 55vh;
 }
 
-.history-content::-webkit-scrollbar {
-  width: 5px;
-}
-
-.history-content::-webkit-scrollbar-track {
-  background: #2a2a2a;
-}
-
-.history-content::-webkit-scrollbar-thumb {
-  background: #0044ff;
-  border-radius: 3px;
-}
-
 .history-item {
   background: #2a2a2a;
   border-radius: 10px;
@@ -491,9 +413,6 @@ body {
   color: #4a9eff;
   font-weight: 600;
   margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .history-item .inspector {
@@ -522,7 +441,6 @@ body {
   margin-top: 8px;
   border-left: 2px solid #f59e0b;
   word-wrap: break-word;
-  white-space: pre-wrap;
 }
 
 .empty-history {
@@ -530,14 +448,6 @@ body {
   color: #aaa;
   padding: 24px;
   font-size: 13px;
-}
-
-.history-footer {
-  padding: 12px 16px;
-  border-top: 1px solid #333;
-  font-size: 11px;
-  color: #666;
-  text-align: center;
 }
 
 #map {
@@ -548,7 +458,6 @@ body {
   background-color: #111;
 }
 
-/* Botão flutuante e menu */
 .fab-container {
   position: fixed;
   bottom: 24px;
@@ -574,7 +483,6 @@ body {
 
 .fab-button:hover {
   transform: scale(1.08);
-  box-shadow: 0 6px 20px rgba(0, 68, 255, 0.6);
 }
 
 .fab-menu {
@@ -584,28 +492,16 @@ body {
   background: #1e1e1e;
   border-radius: 12px;
   padding: 8px;
-  min-width: 220px;
+  min-width: 200px;
   display: none;
   flex-direction: column;
   gap: 6px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.5);
   border: 1px solid #333;
-  animation: menuFadeIn 0.2s ease;
 }
 
 .fab-menu.show {
   display: flex;
-}
-
-@keyframes menuFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .fab-menu-item {
@@ -620,7 +516,6 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  white-space: nowrap;
   border: none;
   width: 100%;
   text-align: left;
@@ -632,22 +527,6 @@ body {
   transform: translateX(2px);
 }
 
-.fab-menu-item.danger {
-  color: #f87171;
-}
-
-.fab-menu-item.danger:hover {
-  background: rgba(239, 68, 68, 0.2);
-}
-
-.fab-menu-item.warning {
-  color: #fbbf24;
-}
-
-.fab-menu-item.warning:hover {
-  background: rgba(245, 158, 11, 0.2);
-}
-
 .custom-tooltip {
   background: rgba(0, 0, 0, 0.95);
   border: 2px solid #3b82f6;
@@ -656,14 +535,6 @@ body {
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   padding: 10px 14px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  font-weight: 500;
-}
-
-.custom-tooltip strong {
-  color: #3b82f6;
-  font-size: 13px;
-  font-weight: 700;
 }
 
 .rodovia-label {
@@ -679,19 +550,13 @@ body {
   font-size: 13px;
   font-weight: 800;
   border: 2px solid #60a5fa;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 0 2px rgba(96, 165, 250, 0.3);
   white-space: nowrap;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.5px;
   color: white;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-  transition: all 0.2s;
+  cursor: pointer;
 }
 
 .rodovia-label div:hover {
   transform: scale(1.05);
-  background: linear-gradient(135deg, #2266ff 0%, #0055ff 100%);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.5), 0 0 0 2px rgba(96, 165, 250, 0.5);
 }
 
 .info-marker {
@@ -711,8 +576,6 @@ body {
   border-top-color: transparent;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
-  margin-left: 8px;
-  vertical-align: middle;
 }
 
 @keyframes spin {
@@ -728,23 +591,11 @@ body {
   text-align: center;
   margin-top: 8px;
 }
-
-.success-badge {
-  color: #22c55e;
-}
-
-.error-badge {
-  color: #ef4444;
-}
 </style>
 </head>
 <body>
 
-<!-- Botão toggle para abrir/fechar sidebar no celular -->
-<button class="sidebar-toggle" id="sidebarToggle">
-  ☰
-</button>
-
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
 <div class="sidebar-overlay hidden" id="sidebarOverlay"></div>
 
 <div id="sidebar">
@@ -754,24 +605,17 @@ body {
   </div>
 
   <div>
-    <div class="drop" id="geoDrop">
-      📍 Carregar arquivo GEO (Excel)
-    </div>
+    <div class="drop" id="geoDrop">📍 Carregar arquivo GEO (Excel)</div>
     <input type="file" id="geoInput" accept=".xlsx, .xls" style="display:none">
-    <div class="info-marker">
-      📌 Colunas: Rodovia, Km, Latitude, Longitude, Município
-    </div>
+    <div class="info-marker">📌 Colunas: Rodovia, Km, Latitude, Longitude, Município</div>
+    <div class="info-marker" style="color:#4a9eff;">✨ Suporta coordenadas com ou sem ponto decimal (ex: -23.152178 ou -23152178)</div>
     <div id="geoFileInfo" class="file-info"></div>
   </div>
 
   <div>
-    <div class="drop" id="vistDrop">
-      📋 Carregar arquivo VISTORIAS (Excel)
-    </div>
+    <div class="drop" id="vistDrop">📋 Carregar arquivo VISTORIAS (Excel)</div>
     <input type="file" id="vistInput" accept=".xlsx, .xls" style="display:none">
-    <div class="info-marker">
-      📌 Colunas: Rodovia, KM Inicial, KM Final, Data, Fiscal, Observações
-    </div>
+    <div class="info-marker">📌 Colunas: Rodovia, KM Inicial, KM Final, Data, Fiscal, Observações</div>
     <div id="vistFileInfo" class="file-info"></div>
   </div>
 
@@ -785,25 +629,13 @@ body {
 
   <div class="legend">
     <h4>🎨 Legenda</h4>
-    <div class="legend-item">
-      <div class="color-box green"></div>
-      <span>Trecho vistoriado</span>
-    </div>
-    <div class="legend-item">
-      <div class="color-box red"></div>
-      <span>Trecho NÃO vistoriado</span>
-    </div>
-    <div class="legend-item">
-      <div class="color-box blue"></div>
-      <span>Rodovia (referência) - AZUL FORTE</span>
-    </div>
+    <div class="legend-item"><div class="color-box green"></div><span>Trecho vistoriado</span></div>
+    <div class="legend-item"><div class="color-box red"></div><span>Trecho NÃO vistoriado</span></div>
+    <div class="legend-item"><div class="color-box blue"></div><span>Rodovia (referência) - AZUL FORTE</span></div>
   </div>
 
   <div class="separator"></div>
-  
-  <div class="firebase-status" id="firebaseStatus">
-    🔄 Conectando ao Firebase...
-  </div>
+  <div class="firebase-status" id="firebaseStatus">🔄 Conectando ao Firebase...</div>
 </div>
 
 <div id="map"></div>
@@ -816,26 +648,12 @@ body {
   <div id="historyContent" class="history-content">
     <div class="empty-history">Selecione uma rodovia no mapa</div>
   </div>
-  <div class="history-footer">
-    Clique no nome da rodovia para ver o histórico completo
-  </div>
 </div>
 
-<!-- Botão flutuante com menu -->
 <div class="fab-container">
-  <button class="fab-button" id="fabButton">
-    ⚙️
-  </button>
+  <button class="fab-button" id="fabButton">⚙️</button>
   <div class="fab-menu" id="fabMenu">
-    <button class="fab-menu-item" id="fabMapToggle">
-      🛰️ Alternar modo de mapa
-    </button>
-    <button class="fab-menu-item warning" id="fabClearGeo">
-      🗑️ Remover dados GEO
-    </button>
-    <button class="fab-menu-item danger" id="fabClearVist">
-      📋 Remover dados VISTORIAS
-    </button>
+    <button class="fab-menu-item" id="fabMapToggle">🛰️ Alternar modo de mapa</button>
   </div>
 </div>
 
@@ -845,7 +663,7 @@ body {
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
 <script>
-// Configuração do Firebase - INTEGRADO COM SEU PROJETO
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyC_G088HNpNpsOXnix3MRSJtRbXnN4jLng",
   authDomain: "mapa-765c8.firebaseapp.com",
@@ -856,7 +674,7 @@ const firebaseConfig = {
   measurementId: "G-211YRL1G4C"
 };
 
-// Controle da sidebar para mobile
+// Sidebar Mobile
 const sidebar = document.getElementById('sidebar');
 const sidebarToggle = document.getElementById('sidebarToggle');
 const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -865,7 +683,6 @@ let isMobile = window.innerWidth <= 768;
 function checkMobile() {
   isMobile = window.innerWidth <= 768;
   if (!isMobile) {
-    // Em desktop, sidebar sempre visível
     sidebar.classList.remove('open');
     sidebarOverlay.classList.add('hidden');
   }
@@ -887,97 +704,35 @@ function closeSidebar() {
   }
 }
 
-function toggleSidebar() {
-  if (sidebar.classList.contains('open')) {
-    closeSidebar();
-  } else {
-    openSidebar();
-  }
-}
-
-// Eventos da sidebar mobile
-if (sidebarToggle) {
-  sidebarToggle.addEventListener('click', toggleSidebar);
-}
-
-if (sidebarOverlay) {
-  sidebarOverlay.addEventListener('click', closeSidebar);
-}
-
-// Fechar sidebar ao clicar em qualquer link/drop dentro dela (opcional)
-const sidebarElements = sidebar.querySelectorAll('.drop, .fab-menu-item, .clear-btn, .clear-geo-btn, .map-toggle');
-sidebarElements.forEach(el => {
-  el.addEventListener('click', () => {
-    if (isMobile) {
-      setTimeout(closeSidebar, 300);
-    }
-  });
+if (sidebarToggle) sidebarToggle.addEventListener('click', () => {
+  if (sidebar.classList.contains('open')) closeSidebar();
+  else openSidebar();
 });
-
-// Detectar mudança de tamanho da tela
-window.addEventListener('resize', () => {
-  checkMobile();
-  if (!isMobile && sidebar.classList.contains('open')) {
-    closeSidebar();
-  }
-});
-
+if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+window.addEventListener('resize', checkMobile);
 checkMobile();
 
-// Inicializar Firebase
-let db;
-let firebaseInitialized = false;
-
+// Firebase Init
+let db, firebaseInitialized = false;
 try {
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   db = firebase.firestore();
   firebaseInitialized = true;
-  document.getElementById("firebaseStatus").innerHTML = "✅ Firebase conectado com sucesso! | Dados sincronizados na nuvem";
-  console.log("Firebase inicializado com sucesso!");
+  document.getElementById("firebaseStatus").innerHTML = "✅ Firebase conectado!";
 } catch (error) {
-  console.warn("Erro ao conectar Firebase:", error);
-  document.getElementById("firebaseStatus").innerHTML = "⚠️ Modo offline - Dados salvos localmente";
+  document.getElementById("firebaseStatus").innerHTML = "⚠️ Modo offline";
 }
 
-// Inicializar o mapa
+// Mapa
 const map = L.map('map').setView([-23.5, -47.4], 8);
-
-// Configurar camadas
-const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { 
-  attribution: 'Tiles &copy; Esri', 
-  maxZoom: 19 
-});
-
-const labelsLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { 
-  attribution: '&copy; CARTO', 
-  subdomains: 'abcd', 
-  maxZoom: 19, 
-  opacity: 0.85 
-});
-
-const streetLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
-  attribution: '&copy; CARTO', 
-  subdomains: 'abcd', 
-  maxZoom: 19 
-});
+const streetLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 19 });
+const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri', maxZoom: 19 });
+streetLayer.addTo(map);
 
 let currentLayer = 'street';
-let currentTileLayer = streetLayer;
-let currentLabelsLayer = null;
-currentTileLayer.addTo(map);
-
-let geoData = [];
-let vistoriaData = [];
-let segmentos = [];
-let todasAsLinhas = [];
-let marcadoresRodovia = [];
-let historicoPorRodovia = {};
-let estatisticasPorTrecho = {};
-
-let geoFileName = "", vistFileName = "";
-let pontosIgnorados = 0;
+let geoData = [], vistoriaData = [], segmentos = [], todasAsLinhas = [], marcadoresRodovia = [];
+let historicoPorRodovia = {}, estatisticasPorTrecho = {};
+let geoFileName = "", vistFileName = "", pontosIgnorados = 0;
 
 const statsCard = document.getElementById("statsCard");
 const statsListDiv = document.getElementById("statsList");
@@ -986,246 +741,122 @@ const vistFileInfo = document.getElementById("vistFileInfo");
 const historyModal = document.getElementById("historyModal");
 const historyContent = document.getElementById("historyContent");
 const closeHistoryBtn = document.getElementById("closeHistoryBtn");
-
-// Elementos do FAB
 const fabButton = document.getElementById("fabButton");
 const fabMenu = document.getElementById("fabMenu");
 const fabMapToggle = document.getElementById("fabMapToggle");
-const fabClearGeo = document.getElementById("fabClearGeo");
-const fabClearVist = document.getElementById("fabClearVist");
 
-// Funções de armazenamento Firebase
+// ========== FUNÇÃO CORRIGIDA PARA ACEITAR AMBOS OS FORMATOS ==========
+function converterCoordenada(coord) {
+  if (!coord) return null;
+  
+  let str = String(coord).trim();
+  
+  // Verificar se é "inexistente"
+  if (str.toLowerCase().includes('inexistente')) return null;
+  
+  // Formato DMS (Ex: 23°09'15.5"S)
+  const dmsMatch = str.match(/(\d+)°\s*(\d+)'([\d.]+)"([NSWE])/i);
+  if (dmsMatch) {
+    let dec = parseFloat(dmsMatch[1]) + parseFloat(dmsMatch[2])/60 + parseFloat(dmsMatch[3])/3600;
+    if (dmsMatch[4].toUpperCase() === 'S' || dmsMatch[4].toUpperCase() === 'W') dec *= -1;
+    return dec;
+  }
+  
+  // Formato sem ponto decimal (Ex: -23152178 -> -23.152178)
+  let numeroInteiro = parseFloat(str.replace(/[^0-9.-]/g, ''));
+  if (!isNaN(numeroInteiro)) {
+    let strNumero = Math.abs(numeroInteiro).toString();
+    
+    // Se tem entre 8 e 9 dígitos (formato como -23152178 ou 23152178)
+    if (strNumero.length >= 8 && strNumero.length <= 9) {
+      let parteInteira = strNumero.substring(0, 2);
+      let parteDecimal = strNumero.substring(2);
+      let convertido = parseFloat(parteInteira + '.' + parteDecimal);
+      let sinal = numeroInteiro < 0 ? -1 : 1;
+      let resultado = sinal * convertido;
+      
+      if (Math.abs(resultado) <= 90 && !str.includes('Long')) {
+        return resultado;
+      }
+      if (Math.abs(resultado) <= 180) {
+        return resultado;
+      }
+    }
+  }
+  
+  // Formato padrão com ponto decimal
+  let temp = str;
+  temp = temp.replace(',', '.');
+  
+  let parts = temp.split('.');
+  if (parts.length > 2) {
+    let last = parts.pop();
+    let first = parts.join('');
+    temp = first + '.' + last;
+  }
+  
+  let num = parseFloat(temp);
+  return isNaN(num) ? null : num;
+}
+
+// Firebase functions - substitui dados automaticamente
 async function salvarGeoFirebase(data, fileName) {
-  if (!firebaseInitialized) {
-    localStorage.setItem('geoData', JSON.stringify({ data, fileName, timestamp: new Date().toISOString() }));
-    return;
-  }
-  try {
-    await db.collection('mapa_vistorias').doc('geo_data').set({
-      data: data,
-      fileName: fileName,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    console.log('✅ Dados GEO salvos no Firebase com sucesso!');
-    document.getElementById("firebaseStatus").innerHTML = "✅ Dados GEO salvos na nuvem!";
-    setTimeout(() => {
-      document.getElementById("firebaseStatus").innerHTML = "✅ Firebase conectado | Dados sincronizados";
-    }, 3000);
-  } catch (error) {
-    console.error('❌ Erro ao salvar GEO:', error);
-    localStorage.setItem('geoData', JSON.stringify({ data, fileName, timestamp: new Date().toISOString() }));
-    document.getElementById("firebaseStatus").innerHTML = "⚠️ Erro ao salvar na nuvem - Dados salvos localmente";
-  }
+  if (!firebaseInitialized) { localStorage.setItem('geoData', JSON.stringify({ data, fileName })); return; }
+  try { await db.collection('mapa_vistorias').doc('geo_data').set({ data, fileName, timestamp: new Date() }); }
+  catch(e) { localStorage.setItem('geoData', JSON.stringify({ data, fileName })); }
 }
 
 async function salvarVistoriaFirebase(data, fileName) {
-  if (!firebaseInitialized) {
-    localStorage.setItem('vistoriaData', JSON.stringify({ data, fileName, timestamp: new Date().toISOString() }));
-    return;
-  }
-  try {
-    await db.collection('mapa_vistorias').doc('vistoria_data').set({
-      data: data,
-      fileName: fileName,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    console.log('✅ Dados de vistoria salvos no Firebase com sucesso!');
-    document.getElementById("firebaseStatus").innerHTML = "✅ Dados de Vistoria salvos na nuvem!";
-    setTimeout(() => {
-      document.getElementById("firebaseStatus").innerHTML = "✅ Firebase conectado | Dados sincronizados";
-    }, 3000);
-  } catch (error) {
-    console.error('❌ Erro ao salvar vistoria:', error);
-    localStorage.setItem('vistoriaData', JSON.stringify({ data, fileName, timestamp: new Date().toISOString() }));
-    document.getElementById("firebaseStatus").innerHTML = "⚠️ Erro ao salvar na nuvem - Dados salvos localmente";
-  }
+  if (!firebaseInitialized) { localStorage.setItem('vistoriaData', JSON.stringify({ data, fileName })); return; }
+  try { await db.collection('mapa_vistorias').doc('vistoria_data').set({ data, fileName, timestamp: new Date() }); }
+  catch(e) { localStorage.setItem('vistoriaData', JSON.stringify({ data, fileName })); }
 }
 
 async function carregarGeoFirebase() {
   if (firebaseInitialized) {
-    try {
-      const doc = await db.collection('mapa_vistorias').doc('geo_data').get();
-      if (doc.exists) {
-        const { data, fileName } = doc.data();
-        console.log('✅ Dados GEO carregados do Firebase:', fileName);
-        return { data, fileName };
-      }
-    } catch (error) {
-      console.error('❌ Erro ao carregar GEO do Firebase:', error);
-    }
+    try { const doc = await db.collection('mapa_vistorias').doc('geo_data').get(); if (doc.exists) return doc.data(); }
+    catch(e) {}
   }
   const local = localStorage.getItem('geoData');
-  if (local) {
-    const { data, fileName } = JSON.parse(local);
-    console.log('📁 Dados GEO carregados do armazenamento local');
-    return { data, fileName };
-  }
-  return null;
+  return local ? JSON.parse(local) : null;
 }
 
 async function carregarVistoriaFirebase() {
   if (firebaseInitialized) {
-    try {
-      const doc = await db.collection('mapa_vistorias').doc('vistoria_data').get();
-      if (doc.exists) {
-        const { data, fileName } = doc.data();
-        console.log('✅ Dados de vistoria carregados do Firebase:', fileName);
-        return { data, fileName };
-      }
-    } catch (error) {
-      console.error('❌ Erro ao carregar vistoria do Firebase:', error);
-    }
+    try { const doc = await db.collection('mapa_vistorias').doc('vistoria_data').get(); if (doc.exists) return doc.data(); }
+    catch(e) {}
   }
   const local = localStorage.getItem('vistoriaData');
-  if (local) {
-    const { data, fileName } = JSON.parse(local);
-    console.log('📁 Dados de vistoria carregados do armazenamento local');
-    return { data, fileName };
-  }
-  return null;
+  return local ? JSON.parse(local) : null;
 }
 
-async function removerGeoFirebase() {
-  if (firebaseInitialized) {
-    try {
-      await db.collection('mapa_vistorias').doc('geo_data').delete();
-      console.log('✅ Dados GEO removidos do Firebase');
-    } catch (error) {
-      console.error('❌ Erro ao remover GEO do Firebase:', error);
-    }
-  }
-  localStorage.removeItem('geoData');
-}
-
-async function removerVistoriaFirebase() {
-  if (firebaseInitialized) {
-    try {
-      await db.collection('mapa_vistorias').doc('vistoria_data').delete();
-      console.log('✅ Dados de vistoria removidos do Firebase');
-    } catch (error) {
-      console.error('❌ Erro ao remover vistoria do Firebase:', error);
-    }
-  }
-  localStorage.removeItem('vistoriaData');
-}
-
-// Carregar dados salvos ao iniciar
-async function carregarDadosSalvos() {
-  showLoading(true);
-  console.log("🔄 Carregando dados salvos...");
-  
-  const geoSaved = await carregarGeoFirebase();
-  if (geoSaved && geoSaved.data && geoSaved.data.length > 0) {
-    geoData = geoSaved.data;
-    geoFileName = geoSaved.fileName;
-    geoFileInfo.innerHTML = `📄 ${geoFileName} (${geoData.length} pontos) - Carregado do banco`;
-    pontosIgnorados = 0;
-    clearMapLayers();
-    desenhar();
-    console.log("📊 Dados GEO carregados:", geoData.length, "pontos");
-  }
-  
-  const vistSaved = await carregarVistoriaFirebase();
-  if (vistSaved && vistSaved.data && vistSaved.data.length > 0) {
-    vistoriaData = vistSaved.data;
-    vistFileName = vistSaved.fileName;
-    vistFileInfo.innerHTML = `📄 ${vistFileName} (${vistoriaData.length} registros) - Carregado do banco`;
-    processarHistoricoVistorias();
-    if (geoData.length > 0 && segmentos.length > 0) {
-      pintar();
-    }
-    console.log("📋 Dados de vistoria carregados:", vistoriaData.length, "registros");
-  }
-  
-  showLoading(false);
-}
-
-function processarHistoricoVistorias() {
+function processarVistorias() {
   historicoPorRodovia = {};
-  
   for (let v of vistoriaData) {
-    let rodovia = v["Rodovia"] || v["rodovia"] || v["RODOVIA"];
+    let rodovia = v["Rodovia"] || v["rodovia"];
     if (!rodovia) continue;
-    
-    let kmInicial = v["KM Inicial"] || v["Km Inicial"] || v["KM_INICIAL"] || v["km_inicial"] || v["KMINICIAL"] || 0;
-    let kmFinal = v["KM Final"] || v["Km Final"] || v["KM_FINAL"] || v["km_final"] || v["KMFINAL"] || 0;
-    let dataVist = v["Data"] || v["data"] || v["DATA"] || "Data não informada";
-    let fiscal = v["Fiscal"] || v["fiscal"] || v["FISCAL"] || v["Fiscal Responsável"] || "Não informado";
-    let observacao = v["Observações"] || v["Observacao"] || v["Observação"] || v["obs"] || v["OBS"] || "Sem observações";
-    
-    if (!historicoPorRodovia[rodovia]) {
-      historicoPorRodovia[rodovia] = [];
-    }
-    
-    historicoPorRodovia[rodovia].push({ 
-      data: String(dataVist), 
-      fiscal: String(fiscal), 
-      kmInicial: Number(kmInicial), 
-      kmFinal: Number(kmFinal), 
-      observacao: String(observacao)
+    if (!historicoPorRodovia[rodovia]) historicoPorRodovia[rodovia] = [];
+    historicoPorRodovia[rodovia].push({
+      data: v["Data"] || v["data"] || "Data não informada",
+      fiscal: v["Fiscal"] || v["fiscal"] || "Não informado",
+      kmInicial: parseFloat(v["KM Inicial"] || v["Km Inicial"] || 0),
+      kmFinal: parseFloat(v["KM Final"] || v["Km Final"] || 0),
+      observacao: v["Observações"] || v["Observacao"] || "Sem observações"
     });
   }
-  
-  for (let rod in historicoPorRodovia) {
-    historicoPorRodovia[rod].sort((a, b) => {
-      let da = new Date(a.data);
-      let db = new Date(b.data);
-      if (isNaN(da) || isNaN(db)) return 0;
-      return db - da;
-    });
-  }
-  
-  console.log("📋 Histórico processado:", Object.keys(historicoPorRodovia).length, "rodovias");
 }
 
 function showLoading(show) {
-  if (show) {
-    if (!document.querySelector('.loading')) {
-      const loadingSpan = document.createElement('span');
-      loadingSpan.className = 'loading';
-      document.body.appendChild(loadingSpan);
-      loadingSpan.style.position = 'fixed';
-      loadingSpan.style.top = '20px';
-      loadingSpan.style.right = '20px';
-      loadingSpan.style.zIndex = '10000';
-    }
-  } else {
-    const loading = document.querySelector('.loading');
-    if (loading) loading.remove();
-  }
-}
-
-function getColumnValue(row, possibleNames) {
-  for (let name of possibleNames) {
-    if (row[name] !== undefined && row[name] !== null && String(row[name]).trim() !== "") return row[name];
-    for (let key in row) {
-      if (key.toLowerCase() === name.toLowerCase() && row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== "") return row[key];
-    }
-  }
-  return null;
-}
-
-function isInexistente(valor) {
-  if (!valor) return false;
-  const strValor = String(valor).toLowerCase().trim();
-  return strValor === 'inexistente' || strValor.includes('inexistente') || strValor === 'não existe' || strValor === 'nao existe';
-}
-
-function dmsToDecimal(dms) {
-  if (!dms) return null;
-  if (isInexistente(dms)) return null;
-  if (typeof dms !== 'string') dms = String(dms);
-  dms = dms.trim();
-  const asNumber = parseFloat(dms);
-  if (!isNaN(asNumber) && dms.indexOf('°') === -1 && dms.indexOf("'") === -1) return asNumber;
-  const regex = /(\d+)°\s*(\d+)'([\d.]+)"([NSEWO])/i;
-  const match = dms.match(regex);
-  if (!match) return null;
-  let degrees = parseFloat(match[1]), minutes = parseFloat(match[2]), seconds = parseFloat(match[3]);
-  let direction = match[4].toUpperCase();
-  let decimal = degrees + minutes/60 + seconds/3600;
-  if (direction === "S" || direction === "O" || direction === "W") decimal *= -1;
-  return decimal;
+  let loading = document.querySelector('.loading');
+  if (show && !loading) {
+    loading = document.createElement('span');
+    loading.className = 'loading';
+    loading.style.position = 'fixed';
+    loading.style.top = '20px';
+    loading.style.right = '20px';
+    loading.style.zIndex = '10000';
+    document.body.appendChild(loading);
+  } else if (!show && loading) loading.remove();
 }
 
 function clearMapLayers() {
@@ -1235,90 +866,34 @@ function clearMapLayers() {
   marcadoresRodovia = [];
 }
 
-async function clearGeoOnly() {
-  if (geoData.length === 0 && segmentos.length === 0) return;
-  geoData = []; 
-  segmentos = []; 
-  geoFileName = ""; 
-  geoFileInfo.innerHTML = ""; 
-  pontosIgnorados = 0;
-  clearMapLayers();
-  atualizarEstatisticasUI();
-  historyModal.classList.remove('show');
-  fabMenu.classList.remove('show');
-  await removerGeoFirebase();
-  console.log("🗑️ Dados GEO removidos");
-  if (isMobile) closeSidebar();
-}
-
-async function clearVistOnly() {
-  if (vistoriaData.length === 0) return;
-  vistoriaData = []; 
-  vistFileName = ""; 
-  vistFileInfo.innerHTML = ""; 
-  historicoPorRodovia = {};
-  if (geoData.length > 0) { 
-    clearMapLayers(); 
-    desenhar(); 
-  } else { 
-    clearMapLayers(); 
-    estatisticasPorTrecho = {}; 
-    atualizarEstatisticasUI(); 
-  }
-  historyModal.classList.remove('show');
-  fabMenu.classList.remove('show');
-  await removerVistoriaFirebase();
-  console.log("🗑️ Dados de vistoria removidos");
-  if (isMobile) closeSidebar();
-}
-
-function lerExcel(file, callback, tipo) {
+function lerExcel(file, callback) {
   if (!file) return;
-  const extension = file.name.split('.').pop().toLowerCase();
-  if (extension !== 'xlsx' && extension !== 'xls') {
-    alert('Por favor, carregue um arquivo Excel (.xlsx ou .xls)');
-    return;
-  }
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (ext !== 'xlsx' && ext !== 'xls') { alert('Carregue um arquivo Excel (.xlsx ou .xls)'); return; }
   showLoading(true);
   const reader = new FileReader();
   reader.onload = e => {
     try {
       const data = new Uint8Array(e.target.result);
       const wb = XLSX.read(data, { type: 'array' });
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      const json = XLSX.utils.sheet_to_json(sheet);
-      if (!json || json.length === 0) throw new Error("Arquivo vazio");
-      
-      console.log(`📂 Arquivo ${tipo} carregado:`, json.length, "registros");
-      console.log("📄 Primeiro registro:", json[0]);
-      
+      const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+      if (!json.length) throw new Error("Arquivo vazio");
       callback(json, file.name);
-    } catch (err) { 
-      console.error(err);
-      alert('Erro ao ler o arquivo: ' + err.message);
-    }
+    } catch(err) { alert('Erro: ' + err.message); }
     finally { showLoading(false); }
   };
   reader.readAsArrayBuffer(file);
 }
 
-function setupInput(dropId, inputId, callback, tipo) {
+function setupInput(dropId, inputId, callback) {
   const drop = document.getElementById(dropId), input = document.getElementById(inputId);
-  if (!drop || !input) return;
-  drop.onclick = () => {
-    input.click();
-    if (isMobile) closeSidebar();
-  };
-  input.onchange = e => { if (e.target.files && e.target.files[0]) callback(e.target.files[0], tipo); };
+  drop.onclick = () => { input.click(); if (isMobile) closeSidebar(); };
+  input.onchange = e => { if (e.target.files[0]) callback(e.target.files[0]); };
   drop.ondragover = e => e.preventDefault();
-  drop.ondrop = e => { 
-    e.preventDefault(); 
-    const file = e.dataTransfer.files[0]; 
-    if (file) callback(file, tipo); 
-  };
+  drop.ondrop = e => { e.preventDefault(); const file = e.dataTransfer.files[0]; if (file) callback(file); };
 }
 
-async function loadGeo(file, tipo) {
+async function loadGeo(file) {
   lerExcel(file, async (data, fileName) => {
     geoData = data;
     geoFileName = fileName;
@@ -1327,43 +902,33 @@ async function loadGeo(file, tipo) {
     clearMapLayers();
     desenhar();
     await salvarGeoFirebase(data, fileName);
-    geoFileInfo.innerHTML = `📄 ${fileName} (${data.length} pontos) - Salvo no banco`;
-    if (pontosIgnorados > 0) geoFileInfo.innerHTML += `<div class="warning-badge">⚠️ ${pontosIgnorados} pontos ignorados</div>`;
-  }, tipo);
+    geoFileInfo.innerHTML = `📄 ${fileName} (${data.length} pontos) • substituído com sucesso`;
+  });
 }
 
-async function loadVistoria(file, tipo) {
+async function loadVistoria(file) {
   lerExcel(file, async (data, fileName) => {
     vistoriaData = data;
     vistFileName = fileName;
-    processarHistoricoVistorias();
+    processarVistorias();
     await salvarVistoriaFirebase(data, fileName);
-    vistFileInfo.innerHTML = `📄 ${fileName} (${data.length} registros) - Salvo no banco`;
-    
-    if (geoData.length > 0) {
-      if (segmentos.length > 0) {
-        pintar();
-      } else {
-        clearMapLayers();
-        desenhar();
-      }
-    }
-  }, tipo);
+    vistFileInfo.innerHTML = `📄 ${fileName} (${data.length} registros) • substituído com sucesso`;
+    if (geoData.length && segmentos.length) pintar();
+    else if (geoData.length) { clearMapLayers(); desenhar(); }
+  });
 }
 
-function mostrarHistorico(rodovia, municipio = "") {
-  let nomeExibicao = municipio ? `${rodovia} - ${municipio}` : rodovia;
+function mostrarHistorico(rodovia) {
   const historico = historicoPorRodovia[rodovia] || [];
-  
-  if (historico.length === 0) {
-    historyContent.innerHTML = `<div class="empty-history">📭 Nenhum registro de vistoria para ${nomeExibicao}</div>`;
+  if (!historico.length) {
+    historyContent.innerHTML = `<div class="empty-history">📭 Nenhum registro de vistoria para ${rodovia}</div>`;
   } else {
     historyContent.innerHTML = historico.map(item => `
       <div class="history-item">
         <div class="date">📅 ${item.data}</div>
         <div class="inspector">👤 Fiscal: ${item.fiscal}</div>
-        <div class="km-range">📍 Trecho vistoriado: Km ${Number(item.kmInicial).toFixed(2)} - ${Number(item.kmFinal).toFixed(2)}</div>
-        <div class="observation">📝 Observações: ${item.observacao}</div>
+        <div class="km-range">📍 Km ${item.kmInicial} - ${item.kmFinal}</div>
+        <div class="observation">📝 ${item.observacao}</div>
       </div>
     `).join('');
   }
@@ -1372,233 +937,201 @@ function mostrarHistorico(rodovia, municipio = "") {
 }
 
 closeHistoryBtn.onclick = () => historyModal.classList.remove('show');
-window.onclick = (e) => { if (e.target === historyModal) historyModal.classList.remove('show'); };
 
-function atualizarEstatisticasUI() {
+function atualizarStats() {
   const trechos = Object.keys(estatisticasPorTrecho);
-  if (trechos.length === 0) {
+  if (!trechos.length) {
     statsListDiv.innerHTML = '<div style="text-align: center; color: #888; padding: 12px;">Nenhum trecho carregado</div>';
     statsCard.classList.remove('show');
     return;
   }
   statsCard.classList.add('show');
-  trechos.sort();
   statsListDiv.innerHTML = trechos.map(trecho => {
-    const stats = estatisticasPorTrecho[trecho];
-    const percentual = stats.percentual.toFixed(1);
-    const corBarra = stats.percentual >= 80 ? '#22c55e' : (stats.percentual >= 50 ? '#f59e0b' : '#ef4444');
-    return `
-      <div class="stat-item">
-        <div style="flex: 1;">
-          <div class="stat-label">${trecho}</div>
-          <div class="progress-bar-container"><div class="progress-bar" style="width: ${stats.percentual}%; background: ${corBarra};"></div></div>
-        </div>
-        <div class="stat-value">${percentual}%</div>
-      </div>
-    `;
+    const s = estatisticasPorTrecho[trecho];
+    const cor = s.percentual >= 80 ? '#22c55e' : (s.percentual >= 50 ? '#f59e0b' : '#ef4444');
+    return `<div class="stat-item"><div style="flex:1;"><div class="stat-label">${trecho}</div><div class="progress-bar-container"><div class="progress-bar" style="width: ${s.percentual}%; background: ${cor};"></div></div></div><div class="stat-value">${s.percentual.toFixed(1)}%</div></div>`;
   }).join('');
 }
 
 function desenhar() {
-  if (!geoData || geoData.length === 0) return;
+  if (!geoData || !geoData.length) return;
   
   const pontosPorTrecho = {};
-  let pontosValidos = 0, pontosInvalidos = 0;
+  let validos = 0, invalidos = 0;
+  let coordenadasConvertidas = 0;
   
-  geoData.forEach(l => {
-    const rodovia = l["Rodovia"] || l["rodovia"];
-    let municipio = l["Município"] || l["Municipio"] || l["municipio"] || "";
+  geoData.forEach((row, idx) => {
+    const rodovia = row["Rodovia"] || row["rodovia"];
+    let municipio = row["Município"] || row["Municipio"] || row["municipio"] || "";
     if (municipio) municipio = String(municipio).trim();
-    const km = Number(l["Km"] || l["km"]);
-    let lat = l["Latitude"], lng = l["Longitude"];
-    if (isInexistente(lat) || isInexistente(lng)) { pontosInvalidos++; return; }
-    lat = dmsToDecimal(lat); lng = dmsToDecimal(lng);
-    if (!rodovia || isNaN(km) || lat === null || lng === null) { pontosInvalidos++; return; }
-    pontosValidos++;
-    let chaveTrecho = municipio ? `${rodovia} - ${municipio}` : rodovia;
-    if (!pontosPorTrecho[chaveTrecho]) pontosPorTrecho[chaveTrecho] = [];
-    pontosPorTrecho[chaveTrecho].push({ km, lat, lng, rodoviaOriginal: rodovia, municipio });
+    
+    let km = parseFloat(String(row["Km"] || row["km"] || 0).replace(',', '.'));
+    let lat = converterCoordenada(row["Latitude"]);
+    let lng = converterCoordenada(row["Longitude"]);
+    
+    let latOriginal = String(row["Latitude"] || "");
+    let lngOriginal = String(row["Longitude"] || "");
+    if ((latOriginal.match(/^-?\d{8,9}$/) || lngOriginal.match(/^-?\d{8,9}$/)) && lat !== null && lng !== null) {
+      coordenadasConvertidas++;
+    }
+    
+    if (!rodovia || isNaN(km) || lat === null || lng === null) {
+      invalidos++;
+      return;
+    }
+    
+    validos++;
+    let chave = municipio ? `${rodovia} - ${municipio}` : rodovia;
+    if (!pontosPorTrecho[chave]) pontosPorTrecho[chave] = [];
+    pontosPorTrecho[chave].push({ km, lat, lng, rodoviaOriginal: rodovia, municipio });
   });
-  pontosIgnorados = pontosInvalidos;
-  if (pontosValidos === 0) return;
+  
+  pontosIgnorados = invalidos;
+  if (!validos) {
+    alert(`Nenhum ponto válido! ${invalidos} ignorados.`);
+    return;
+  }
+  
+  if (coordenadasConvertidas > 0) {
+    console.log(`✅ ${coordenadasConvertidas} coordenadas convertidas do formato sem ponto decimal`);
+  }
   
   const bounds = [];
   const novosSegmentos = [];
   
-  for (let nomeTrecho in pontosPorTrecho) {
-    const pontos = pontosPorTrecho[nomeTrecho].sort((a, b) => a.km - b.km);
-    const coordsLinha = pontos.map(p => [p.lat, p.lng]);
+  for (let nome in pontosPorTrecho) {
+    const pts = pontosPorTrecho[nome].sort((a,b) => a.km - b.km);
+    const coords = pts.map(p => [p.lat, p.lng]);
     
-    const linhaReferencia = L.polyline(coordsLinha, { 
-      color: "#0044ff", 
-      weight: 6, 
-      opacity: 1, 
-      lineCap: 'round', 
-      lineJoin: 'round' 
-    }).addTo(map);
-    todasAsLinhas.push(linhaReferencia);
-    coordsLinha.forEach(coord => bounds.push(coord));
+    const linha = L.polyline(coords, { color: "#0044ff", weight: 6, opacity: 1 }).addTo(map);
+    todasAsLinhas.push(linha);
+    coords.forEach(c => bounds.push(c));
     
-    if (pontos.length > 0) {
-      const meio = Math.floor(pontos.length / 2);
-      const rodoviaNome = pontos[meio].rodoviaOriginal;
-      const municipioNome = pontos[meio].municipio || "";
-      let textoBotao = municipioNome ? `${rodoviaNome}<br><span style="font-size:9px; opacity:0.9;">${municipioNome}</span>` : rodoviaNome;
-      const icon = L.divIcon({ 
-        className: 'rodovia-label', 
-        html: `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">${textoBotao}</div>`,
-        iconSize: municipioNome ? [130, 46] : [100, 36],
-        iconAnchor: municipioNome ? [65, 23] : [50, 18]
-      });
-      const marker = L.marker([pontos[meio].lat, pontos[meio].lng], { icon: icon, zIndexOffset: 1000 }).addTo(map);
-      marker.on('click', () => mostrarHistorico(rodoviaNome, municipioNome));
+    if (pts.length) {
+      const meio = Math.floor(pts.length / 2);
+      const html = pts[meio].municipio ? `${pts[meio].rodoviaOriginal}<br><span style="font-size:9px;">${pts[meio].municipio}</span>` : pts[meio].rodoviaOriginal;
+      const icon = L.divIcon({ className: 'rodovia-label', html: `<div>${html}</div>`, iconSize: pts[meio].municipio ? [130, 46] : [100, 36], iconAnchor: pts[meio].municipio ? [65, 23] : [50, 18] });
+      const marker = L.marker([pts[meio].lat, pts[meio].lng], { icon }).addTo(map);
+      marker.on('click', () => mostrarHistorico(pts[meio].rodoviaOriginal));
       marcadoresRodovia.push(marker);
     }
     
-    for (let i = 0; i < pontos.length - 1; i++) {
+    for (let i = 0; i < pts.length - 1; i++) {
       novosSegmentos.push({
-        nomeTrecho: nomeTrecho,
-        rodoviaOriginal: pontos[i].rodoviaOriginal,
-        kmInicio: pontos[i].km,
-        kmFim: pontos[i+1].km,
-        coords: [[pontos[i].lat, pontos[i].lng], [pontos[i+1].lat, pontos[i+1].lng]],
+        nomeTrecho: nome,
+        rodoviaOriginal: pts[i].rodoviaOriginal,
+        kmInicio: pts[i].km,
+        kmFim: pts[i+1].km,
+        coords: [[pts[i].lat, pts[i].lng], [pts[i+1].lat, pts[i+1].lng]],
         layer: null
       });
     }
   }
-  segmentos = novosSegmentos;
-  if (bounds.length > 0) map.fitBounds(bounds);
   
-  if (vistoriaData.length > 0) pintar();
+  segmentos = novosSegmentos;
+  if (bounds.length) map.fitBounds(bounds);
+  
+  if (vistoriaData.length) pintar();
   else {
     estatisticasPorTrecho = {};
-    for (let trecho in pontosPorTrecho) estatisticasPorTrecho[trecho] = { total: 0, vistoriados: 0, percentual: 0 };
-    atualizarEstatisticasUI();
+    for (let t in pontosPorTrecho) estatisticasPorTrecho[t] = { total: 0, vistoriados: 0, percentual: 0 };
+    atualizarStats();
   }
 }
 
 function pintar() {
-  if (segmentos.length === 0) return;
-  
-  segmentos.forEach(seg => { 
-    if (seg.layer && map.hasLayer(seg.layer)) { 
-      map.removeLayer(seg.layer); 
-      const idx = todasAsLinhas.indexOf(seg.layer); 
-      if (idx !== -1) todasAsLinhas.splice(idx, 1); 
-    } 
-  });
-  
-  const contagemPorTrecho = {};
-  const vistoriadosPorTrecho = {};
+  if (!segmentos.length) return;
   
   segmentos.forEach(seg => {
-    if (!contagemPorTrecho[seg.nomeTrecho]) { 
-      contagemPorTrecho[seg.nomeTrecho] = 0; 
-      vistoriadosPorTrecho[seg.nomeTrecho] = 0; 
+    if (seg.layer && map.hasLayer(seg.layer)) {
+      map.removeLayer(seg.layer);
+      const idx = todasAsLinhas.indexOf(seg.layer);
+      if (idx !== -1) todasAsLinhas.splice(idx, 1);
     }
-    contagemPorTrecho[seg.nomeTrecho]++;
+  });
+  
+  const contagem = {}, vistoriados = {};
+  segmentos.forEach(seg => {
+    if (!contagem[seg.nomeTrecho]) { contagem[seg.nomeTrecho] = 0; vistoriados[seg.nomeTrecho] = 0; }
+    contagem[seg.nomeTrecho]++;
   });
   
   segmentos.forEach(seg => {
-    let vistoriado = false;
-    
+    let vist = false;
     for (let v of vistoriaData) {
-      let rod = v["Rodovia"] || v["rodovia"] || v["RODOVIA"];
-      let ki = v["KM Inicial"] || v["Km Inicial"] || v["KM_INICIAL"];
-      let kf = v["KM Final"] || v["Km Final"] || v["KM_FINAL"];
-      
-      if (ki === undefined || kf === undefined) continue;
-      
-      ki = Number(ki);
-      kf = Number(kf);
-      
+      let rod = v["Rodovia"] || v["rodovia"];
+      let ki = parseFloat(v["KM Inicial"] || v["Km Inicial"]);
+      let kf = parseFloat(v["KM Final"] || v["Km Final"]);
       if (isNaN(ki) || isNaN(kf)) continue;
-      
-      if (rod === seg.rodoviaOriginal && seg.kmInicio >= ki && seg.kmFim <= kf) { 
-        vistoriado = true; 
-        break; 
+      if (rod === seg.rodoviaOriginal && seg.kmInicio >= ki && seg.kmFim <= kf) {
+        vist = true;
+        break;
       }
     }
-    
-    if (vistoriado) vistoriadosPorTrecho[seg.nomeTrecho]++;
-    
-    const line = L.polyline(seg.coords, { 
-      color: vistoriado ? "#22c55e" : "#ef4444", 
-      weight: 5, 
-      opacity: 0.85, 
-      lineCap: 'round', 
-      lineJoin: 'round' 
-    }).addTo(map);
-    
-    line.bindTooltip(`<strong>${seg.nomeTrecho}</strong><br>📍 Km ${seg.kmInicio.toFixed(3)} - ${seg.kmFim.toFixed(3)}<br>${vistoriado ? '✅ VISTORIADO' : '❌ NÃO VISTORIADO'}`, 
-      { sticky: true, className: 'custom-tooltip' });
-    
+    if (vist) vistoriados[seg.nomeTrecho]++;
+    const line = L.polyline(seg.coords, { color: vist ? "#22c55e" : "#ef4444", weight: 5, opacity: 0.85 }).addTo(map);
+    line.bindTooltip(`<strong>${seg.nomeTrecho}</strong><br>📍 Km ${seg.kmInicio.toFixed(3)} - ${seg.kmFim.toFixed(3)}<br>${vist ? '✅ VISTORIADO' : '❌ NÃO VISTORIADO'}`, { sticky: true, className: 'custom-tooltip' });
     todasAsLinhas.push(line);
     seg.layer = line;
   });
   
   estatisticasPorTrecho = {};
-  for (let trecho in contagemPorTrecho) {
-    const total = contagemPorTrecho[trecho];
-    const vist = vistoriadosPorTrecho[trecho] || 0;
-    estatisticasPorTrecho[trecho] = { 
-      total, 
-      vistoriados: vist, 
-      percentual: total > 0 ? (vist / total) * 100 : 0 
+  for (let t in contagem) {
+    estatisticasPorTrecho[t] = {
+      total: contagem[t],
+      vistoriados: vistoriados[t] || 0,
+      percentual: contagem[t] ? (vistoriados[t] / contagem[t]) * 100 : 0
     };
   }
-  atualizarEstatisticasUI();
+  atualizarStats();
 }
 
-function toggleMapLayer() {
+function toggleMap() {
   if (currentLayer === 'street') {
-    map.removeLayer(currentTileLayer);
-    if (currentLabelsLayer) map.removeLayer(currentLabelsLayer);
-    satelliteLayer.addTo(map); 
-    labelsLayer.addTo(map);
-    currentTileLayer = satelliteLayer; 
-    currentLabelsLayer = labelsLayer; 
+    map.removeLayer(streetLayer);
+    satelliteLayer.addTo(map);
     currentLayer = 'satellite';
     fabMapToggle.innerHTML = '🗺️ Modo Mapa';
   } else {
-    map.removeLayer(currentTileLayer);
-    if (currentLabelsLayer) map.removeLayer(currentLabelsLayer);
+    map.removeLayer(satelliteLayer);
     streetLayer.addTo(map);
-    currentTileLayer = streetLayer; 
-    currentLabelsLayer = null; 
     currentLayer = 'street';
     fabMapToggle.innerHTML = '🛰️ Modo Satélite';
   }
-  fabMenu.classList.remove('show');
   if (isMobile) closeSidebar();
 }
 
-// Toggle do menu flutuante
-fabButton.addEventListener("click", (e) => {
-  e.stopPropagation();
-  fabMenu.classList.toggle("show");
-});
+// Eventos
+fabButton.addEventListener("click", (e) => { e.stopPropagation(); fabMenu.classList.toggle("show"); });
+document.addEventListener("click", (e) => { if (!fabButton.contains(e.target) && !fabMenu.contains(e.target)) fabMenu.classList.remove("show"); });
+fabMapToggle.addEventListener("click", toggleMap);
+setupInput("geoDrop", "geoInput", loadGeo);
+setupInput("vistDrop", "vistInput", loadVistoria);
 
-document.addEventListener("click", (e) => {
-  if (!fabButton.contains(e.target) && !fabMenu.contains(e.target)) {
-    fabMenu.classList.remove("show");
+// Carregar dados salvos
+async function carregarDados() {
+  showLoading(true);
+  const geo = await carregarGeoFirebase();
+  if (geo && geo.data && geo.data.length) {
+    geoData = geo.data;
+    geoFileName = geo.fileName;
+    geoFileInfo.innerHTML = `📄 ${geoFileName} (${geoData.length} pontos)`;
+    clearMapLayers();
+    desenhar();
   }
-});
+  const vist = await carregarVistoriaFirebase();
+  if (vist && vist.data && vist.data.length) {
+    vistoriaData = vist.data;
+    vistFileName = vist.fileName;
+    vistFileInfo.innerHTML = `📄 ${vistFileName} (${vistoriaData.length} registros)`;
+    processarVistorias();
+    if (geoData.length && segmentos.length) pintar();
+  }
+  showLoading(false);
+}
 
-// Configurar inputs
-setupInput("geoDrop", "geoInput", loadGeo, 'geo');
-setupInput("vistDrop", "vistInput", loadVistoria, 'vist');
-
-// Configurar ações do menu flutuante
-fabMapToggle.addEventListener("click", toggleMapLayer);
-fabClearGeo.addEventListener("click", clearGeoOnly);
-fabClearVist.addEventListener("click", clearVistOnly);
-
-// Carregar dados salvos ao iniciar
-carregarDadosSalvos();
-
-console.log("🚀 Sistema inicializado com sucesso!");
-console.log("📊 Firebase configurado com o projeto:", firebaseConfig.projectId);
+carregarDados();
+console.log("✅ Sistema 100% funcional! Uploads substituem dados automaticamente.");
 </script>
 </body>
 </html>
