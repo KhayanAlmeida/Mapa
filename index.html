@@ -257,7 +257,7 @@ body {
 }
 
 .stats-list {
-  max-height: 200px;
+  max-height: 250px;
   overflow-y: auto;
   padding-right: 4px;
 }
@@ -268,14 +268,15 @@ body {
   align-items: center;
   margin: 8px 0;
   font-size: 12px;
-  padding: 6px 8px;
+  padding: 8px 10px;
   background: #2a2a2a;
   border-radius: 8px;
   transition: all 0.1s;
+  cursor: pointer;
 }
 
 .stat-item:hover {
-  background: #333;
+  background: #3a4a6a;
   transform: translateX(2px);
 }
 
@@ -285,6 +286,7 @@ body {
   font-size: 12px;
   word-break: break-word;
   flex: 1;
+  cursor: pointer;
 }
 
 .stat-value {
@@ -320,16 +322,6 @@ body {
   height: 1px;
   background: linear-gradient(90deg, transparent, #333, transparent);
   margin: 10px 0;
-}
-
-.warning-badge {
-  background: rgba(245, 158, 11, 0.2);
-  border-left: 3px solid #f59e0b;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  margin-top: 8px;
-  color: #fbbf24;
 }
 
 .history-modal {
@@ -420,7 +412,7 @@ body {
   font-weight: 600;
   color: white;
   margin-bottom: 6px;
-  background: #1e3a8a20;
+  background: #1e3a8a40;
   padding: 4px 8px;
   border-radius: 6px;
   display: inline-block;
@@ -537,26 +529,63 @@ body {
   padding: 10px 14px;
 }
 
-.rodovia-label {
+/* Estilos para ícones de rodovia */
+.rodovia-marker {
   background: transparent;
   border: none;
-}
-
-.rodovia-label div {
-  background: linear-gradient(135deg, #0044ff 0%, #1e40af 100%);
-  backdrop-filter: blur(8px);
-  padding: 8px 16px;
-  border-radius: 30px;
-  font-size: 13px;
-  font-weight: 800;
-  border: 2px solid #60a5fa;
-  white-space: nowrap;
-  color: white;
   cursor: pointer;
 }
 
-.rodovia-label div:hover {
+.rodovia-marker div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(0, 68, 255, 0.95) 0%, rgba(30, 64, 175, 0.95) 100%);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  padding: 8px 14px;
+  border: 1.5px solid rgba(96, 165, 250, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(0, 68, 255, 0.2);
+  transition: all 0.2s ease;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  min-width: 100px;
+}
+
+.rodovia-marker div:hover {
   transform: scale(1.05);
+  background: linear-gradient(135deg, rgba(0, 90, 255, 0.98) 0%, rgba(50, 100, 200, 0.98) 100%);
+  border-color: rgba(96, 165, 250, 0.9);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(0, 68, 255, 0.3);
+}
+
+.rodovia-nome {
+  font-size: 12px;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.rodovia-municipio {
+  font-size: 9px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 2px;
+  white-space: nowrap;
+  letter-spacing: -0.2px;
+}
+
+.rodovia-marker.sem-municipio div {
+  padding: 6px 12px;
+  min-width: 80px;
+}
+
+.rodovia-marker.sem-municipio .rodovia-nome {
+  font-size: 11px;
 }
 
 .info-marker {
@@ -591,6 +620,14 @@ body {
   text-align: center;
   margin-top: 8px;
 }
+
+.stat-click-hint {
+  font-size: 10px;
+  color: #888;
+  margin-top: 8px;
+  text-align: center;
+  font-style: italic;
+}
 </style>
 </head>
 <body>
@@ -624,7 +661,7 @@ body {
     <div id="statsList" class="stats-list">
       <div style="text-align: center; color: #888; padding: 12px;">Carregue os dados para ver as estatísticas</div>
     </div>
-    <div class="stat-detail">📌 Clique no nome da rodovia no mapa para ver o histórico completo</div>
+    <div class="stat-click-hint">🔍 Clique em qualquer trecho para centralizar no mapa</div>
   </div>
 
   <div class="legend">
@@ -733,6 +770,7 @@ let currentLayer = 'street';
 let geoData = [], vistoriaData = [], segmentos = [], todasAsLinhas = [], marcadoresRodovia = [];
 let historicoPorRodovia = {}, estatisticasPorTrecho = {};
 let geoFileName = "", vistFileName = "", pontosIgnorados = 0;
+let boundsPorRodovia = {}; // Armazena os bounds de cada rodovia para centralização
 
 const statsCard = document.getElementById("statsCard");
 const statsListDiv = document.getElementById("statsList");
@@ -833,17 +871,25 @@ async function carregarVistoriaFirebase() {
 function processarVistorias() {
   historicoPorRodovia = {};
   for (let v of vistoriaData) {
+    // Suporta diferentes nomes de colunas
     let rodovia = v["Rodovia"] || v["rodovia"];
+    let data = v["Data"] || v["data"] || v["DATA"] || "Data não informada";
+    let fiscal = v["Fiscal"] || v["fiscal"] || v["FISCAL"] || v["Responsável"] || v["responsavel"] || "Não informado";
+    let kmInicial = parseFloat(v["KM Inicial"] || v["Km Inicial"] || v["KM_INICIAL"] || v["km_inicial"] || 0);
+    let kmFinal = parseFloat(v["KM Final"] || v["Km Final"] || v["KM_FINAL"] || v["km_final"] || 0);
+    let observacao = v["Observações"] || v["Observacao"] || v["OBS"] || v["obs"] || "Sem observações";
+    
     if (!rodovia) continue;
     if (!historicoPorRodovia[rodovia]) historicoPorRodovia[rodovia] = [];
     historicoPorRodovia[rodovia].push({
-      data: v["Data"] || v["data"] || "Data não informada",
-      fiscal: v["Fiscal"] || v["fiscal"] || "Não informado",
-      kmInicial: parseFloat(v["KM Inicial"] || v["Km Inicial"] || 0),
-      kmFinal: parseFloat(v["KM Final"] || v["Km Final"] || 0),
-      observacao: v["Observações"] || v["Observacao"] || "Sem observações"
+      data: data,
+      fiscal: fiscal,
+      kmInicial: kmInicial,
+      kmFinal: kmFinal,
+      observacao: observacao
     });
   }
+  console.log("✅ Vistorias processadas:", Object.keys(historicoPorRodovia));
 }
 
 function showLoading(show) {
@@ -864,6 +910,7 @@ function clearMapLayers() {
   marcadoresRodovia.forEach(marker => { if (marker && map.hasLayer(marker)) map.removeLayer(marker); });
   todasAsLinhas = [];
   marcadoresRodovia = [];
+  boundsPorRodovia = {};
 }
 
 function lerExcel(file, callback) {
@@ -938,6 +985,16 @@ function mostrarHistorico(rodovia) {
 
 closeHistoryBtn.onclick = () => historyModal.classList.remove('show');
 
+// Função para centralizar o mapa em uma rodovia específica
+function centralizarRodovia(rodoviaNome) {
+  if (boundsPorRodovia[rodoviaNome]) {
+    map.fitBounds(boundsPorRodovia[rodoviaNome], { padding: [50, 50] });
+    if (isMobile) closeSidebar();
+  } else {
+    console.warn(`Bounds não encontrados para: ${rodoviaNome}`);
+  }
+}
+
 function atualizarStats() {
   const trechos = Object.keys(estatisticasPorTrecho);
   if (!trechos.length) {
@@ -949,8 +1006,52 @@ function atualizarStats() {
   statsListDiv.innerHTML = trechos.map(trecho => {
     const s = estatisticasPorTrecho[trecho];
     const cor = s.percentual >= 80 ? '#22c55e' : (s.percentual >= 50 ? '#f59e0b' : '#ef4444');
-    return `<div class="stat-item"><div style="flex:1;"><div class="stat-label">${trecho}</div><div class="progress-bar-container"><div class="progress-bar" style="width: ${s.percentual}%; background: ${cor};"></div></div></div><div class="stat-value">${s.percentual.toFixed(1)}%</div></div>`;
+    // Extrai o nome da rodovia do trecho (remove o município se existir)
+    const nomeRodovia = trecho.split(' - ')[0];
+    return `<div class="stat-item" data-rodovia="${nomeRodovia}" style="cursor: pointer;">
+      <div style="flex:1;">
+        <div class="stat-label">${trecho}</div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: ${s.percentual}%; background: ${cor};"></div>
+        </div>
+      </div>
+      <div class="stat-value">${s.percentual.toFixed(1)}%</div>
+    </div>`;
   }).join('');
+  
+  // Adiciona evento de clique em cada item da estatística
+  document.querySelectorAll('.stat-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const rodovia = item.getAttribute('data-rodovia');
+      if (rodovia) {
+        centralizarRodovia(rodovia);
+      }
+    });
+  });
+}
+
+// Função para criar o ícone da rodovia
+function criarIconeRodovia(rodoviaNome, municipio) {
+  const hasMunicipio = municipio && municipio.trim() !== '';
+  
+  let html = '<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">';
+  html += `<span class="rodovia-nome" style="display: block; text-align: center;">${rodoviaNome}</span>`;
+  if (hasMunicipio) {
+    html += `<span class="rodovia-municipio" style="display: block; text-align: center;">${municipio}</span>`;
+  }
+  html += '</div>';
+  
+  const width = hasMunicipio ? 130 : 100;
+  const height = hasMunicipio ? 52 : 38;
+  
+  return L.divIcon({
+    className: `rodovia-marker ${!hasMunicipio ? 'sem-municipio' : ''}`,
+    html: html,
+    iconSize: [width, height],
+    iconAnchor: [width / 2, height / 2],
+    popupAnchor: [0, -height / 2]
+  });
 }
 
 function desenhar() {
@@ -1003,19 +1104,27 @@ function desenhar() {
     const pts = pontosPorTrecho[nome].sort((a,b) => a.km - b.km);
     const coords = pts.map(p => [p.lat, p.lng]);
     
-    const linha = L.polyline(coords, { color: "#0044ff", weight: 6, opacity: 1 }).addTo(map);
+    // Guarda os bounds desta rodovia para centralização futura
+    if (coords.length > 0) {
+      const rodoviaBounds = L.latLngBounds(coords);
+      boundsPorRodovia[pts[0].rodoviaOriginal] = rodoviaBounds;
+    }
+    
+    // Linha azul de referência
+    const linha = L.polyline(coords, { color: "#0044ff", weight: 6, opacity: 1, smoothFactor: 1 }).addTo(map);
     todasAsLinhas.push(linha);
     coords.forEach(c => bounds.push(c));
     
+    // Marcador no meio da rodovia
     if (pts.length) {
       const meio = Math.floor(pts.length / 2);
-      const html = pts[meio].municipio ? `${pts[meio].rodoviaOriginal}<br><span style="font-size:9px;">${pts[meio].municipio}</span>` : pts[meio].rodoviaOriginal;
-      const icon = L.divIcon({ className: 'rodovia-label', html: `<div>${html}</div>`, iconSize: pts[meio].municipio ? [130, 46] : [100, 36], iconAnchor: pts[meio].municipio ? [65, 23] : [50, 18] });
+      const icon = criarIconeRodovia(pts[meio].rodoviaOriginal, pts[meio].municipio);
       const marker = L.marker([pts[meio].lat, pts[meio].lng], { icon }).addTo(map);
       marker.on('click', () => mostrarHistorico(pts[meio].rodoviaOriginal));
       marcadoresRodovia.push(marker);
     }
     
+    // Segmentos
     for (let i = 0; i < pts.length - 1; i++) {
       novosSegmentos.push({
         nomeTrecho: nome,
@@ -1069,7 +1178,7 @@ function pintar() {
       }
     }
     if (vist) vistoriados[seg.nomeTrecho]++;
-    const line = L.polyline(seg.coords, { color: vist ? "#22c55e" : "#ef4444", weight: 5, opacity: 0.85 }).addTo(map);
+    const line = L.polyline(seg.coords, { color: vist ? "#22c55e" : "#ef4444", weight: 5, opacity: 0.85, smoothFactor: 1 }).addTo(map);
     line.bindTooltip(`<strong>${seg.nomeTrecho}</strong><br>📍 Km ${seg.kmInicio.toFixed(3)} - ${seg.kmFim.toFixed(3)}<br>${vist ? '✅ VISTORIADO' : '❌ NÃO VISTORIADO'}`, { sticky: true, className: 'custom-tooltip' });
     todasAsLinhas.push(line);
     seg.layer = line;
@@ -1131,7 +1240,7 @@ async function carregarDados() {
 }
 
 carregarDados();
-console.log("✅ Sistema 100% funcional! Uploads substituem dados automaticamente.");
+console.log("✅ Sistema 100% funcional! Clique nos trechos para centralizar o mapa.");
 </script>
 </body>
 </html>
