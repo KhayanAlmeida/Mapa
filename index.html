@@ -628,6 +628,21 @@ body {
   text-align: center;
   font-style: italic;
 }
+
+.debug-info {
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 10px;
+  color: #f59e0b;
+  margin-top: 8px;
+  display: none;
+  font-family: monospace;
+}
+
+.debug-info.show {
+  display: block;
+}
 </style>
 </head>
 <body>
@@ -654,6 +669,7 @@ body {
     <input type="file" id="vistInput" accept=".xlsx, .xls" style="display:none">
     <div class="info-marker">📌 Colunas: Rodovia, KM Inicial, KM Final, Data, Fiscal, Observações</div>
     <div id="vistFileInfo" class="file-info"></div>
+    <div id="debugInfo" class="debug-info"></div>
   </div>
 
   <div class="stats-card" id="statsCard">
@@ -770,7 +786,7 @@ let currentLayer = 'street';
 let geoData = [], vistoriaData = [], segmentos = [], todasAsLinhas = [], marcadoresRodovia = [];
 let historicoPorRodovia = {}, estatisticasPorTrecho = {};
 let geoFileName = "", vistFileName = "", pontosIgnorados = 0;
-let boundsPorRodovia = {}; // Armazena os bounds de cada rodovia para centralização
+let boundsPorRodovia = {};
 
 const statsCard = document.getElementById("statsCard");
 const statsListDiv = document.getElementById("statsList");
@@ -782,114 +798,102 @@ const closeHistoryBtn = document.getElementById("closeHistoryBtn");
 const fabButton = document.getElementById("fabButton");
 const fabMenu = document.getElementById("fabMenu");
 const fabMapToggle = document.getElementById("fabMapToggle");
+const debugInfo = document.getElementById("debugInfo");
 
-// ========== FUNÇÃO CORRIGIDA PARA ACEITAR AMBOS OS FORMATOS ==========
-function converterCoordenada(coord) {
-  if (!coord) return null;
+// Função para extrair o nome do fiscal de qualquer coluna
+function extrairFiscal(row) {
+  // Lista de possíveis nomes de coluna para fiscal (ordem de prioridade)
+  const possiveisNomes = [
+    "Fiscal", "fiscal", "FISCAL",
+    "Responsável", "responsavel", "RESPONSÁVEL",
+    "Inspetor", "inspetor", "INSPETOR",
+    "Vistoriador", "vistoriador", "VISTORIADOR",
+    "Técnico", "tecnico", "TÉCNICO",
+    "Profissional", "profissional",
+    "Nome", "nome", "NOME",
+    "Responsavel", "RESPONSAVEL" // sem acento
+  ];
   
-  let str = String(coord).trim();
-  
-  // Verificar se é "inexistente"
-  if (str.toLowerCase().includes('inexistente')) return null;
-  
-  // Formato DMS (Ex: 23°09'15.5"S)
-  const dmsMatch = str.match(/(\d+)°\s*(\d+)'([\d.]+)"([NSWE])/i);
-  if (dmsMatch) {
-    let dec = parseFloat(dmsMatch[1]) + parseFloat(dmsMatch[2])/60 + parseFloat(dmsMatch[3])/3600;
-    if (dmsMatch[4].toUpperCase() === 'S' || dmsMatch[4].toUpperCase() === 'W') dec *= -1;
-    return dec;
+  for (let nome of possiveisNomes) {
+    if (row[nome] && String(row[nome]).trim() !== "") {
+      return String(row[nome]).trim();
+    }
   }
   
-  // Formato sem ponto decimal (Ex: -23152178 -> -23.152178)
-  let numeroInteiro = parseFloat(str.replace(/[^0-9.-]/g, ''));
-  if (!isNaN(numeroInteiro)) {
-    let strNumero = Math.abs(numeroInteiro).toString();
-    
-    // Se tem entre 8 e 9 dígitos (formato como -23152178 ou 23152178)
-    if (strNumero.length >= 8 && strNumero.length <= 9) {
-      let parteInteira = strNumero.substring(0, 2);
-      let parteDecimal = strNumero.substring(2);
-      let convertido = parseFloat(parteInteira + '.' + parteDecimal);
-      let sinal = numeroInteiro < 0 ? -1 : 1;
-      let resultado = sinal * convertido;
-      
-      if (Math.abs(resultado) <= 90 && !str.includes('Long')) {
-        return resultado;
-      }
-      if (Math.abs(resultado) <= 180) {
-        return resultado;
+  // Se não encontrou em nenhuma coluna específica, procura qualquer coluna que contenha palavras relacionadas
+  for (let key in row) {
+    const lowerKey = key.toLowerCase();
+    if (lowerKey.includes("fiscal") || 
+        lowerKey.includes("respons") || 
+        lowerKey.includes("inspet") || 
+        lowerKey.includes("vist") ||
+        lowerKey.includes("tecnico") ||
+        lowerKey.includes("nome")) {
+      if (row[key] && String(row[key]).trim() !== "") {
+        return String(row[key]).trim();
       }
     }
   }
   
-  // Formato padrão com ponto decimal
-  let temp = str;
-  temp = temp.replace(',', '.');
-  
-  let parts = temp.split('.');
-  if (parts.length > 2) {
-    let last = parts.pop();
-    let first = parts.join('');
-    temp = first + '.' + last;
-  }
-  
-  let num = parseFloat(temp);
-  return isNaN(num) ? null : num;
-}
-
-// Firebase functions - substitui dados automaticamente
-async function salvarGeoFirebase(data, fileName) {
-  if (!firebaseInitialized) { localStorage.setItem('geoData', JSON.stringify({ data, fileName })); return; }
-  try { await db.collection('mapa_vistorias').doc('geo_data').set({ data, fileName, timestamp: new Date() }); }
-  catch(e) { localStorage.setItem('geoData', JSON.stringify({ data, fileName })); }
-}
-
-async function salvarVistoriaFirebase(data, fileName) {
-  if (!firebaseInitialized) { localStorage.setItem('vistoriaData', JSON.stringify({ data, fileName })); return; }
-  try { await db.collection('mapa_vistorias').doc('vistoria_data').set({ data, fileName, timestamp: new Date() }); }
-  catch(e) { localStorage.setItem('vistoriaData', JSON.stringify({ data, fileName })); }
-}
-
-async function carregarGeoFirebase() {
-  if (firebaseInitialized) {
-    try { const doc = await db.collection('mapa_vistorias').doc('geo_data').get(); if (doc.exists) return doc.data(); }
-    catch(e) {}
-  }
-  const local = localStorage.getItem('geoData');
-  return local ? JSON.parse(local) : null;
-}
-
-async function carregarVistoriaFirebase() {
-  if (firebaseInitialized) {
-    try { const doc = await db.collection('mapa_vistorias').doc('vistoria_data').get(); if (doc.exists) return doc.data(); }
-    catch(e) {}
-  }
-  const local = localStorage.getItem('vistoriaData');
-  return local ? JSON.parse(local) : null;
+  return "Não informado";
 }
 
 function processarVistorias() {
   historicoPorRodovia = {};
+  let primeirasColunas = null;
+  let fiscalExemplos = [];
+  
   for (let v of vistoriaData) {
-    // Suporta diferentes nomes de colunas
-    let rodovia = v["Rodovia"] || v["rodovia"];
-    let data = v["Data"] || v["data"] || v["DATA"] || "Data não informada";
-    let fiscal = v["Fiscal"] || v["fiscal"] || v["FISCAL"] || v["Responsável"] || v["responsavel"] || "Não informado";
+    let rodovia = v["Rodovia"] || v["rodovia"] || "";
+    
+    // Diagnóstico: capturar nomes das colunas do primeiro registro
+    if (!primeirasColunas) {
+      primeirasColunas = Object.keys(v);
+      console.log("📋 Colunas encontradas no arquivo de vistorias:", primeirasColunas);
+      
+      // Mostrar debug no sidebar
+      debugInfo.innerHTML = `<strong>🔍 Diagnóstico:</strong><br>
+      Colunas encontradas: ${primeirasColunas.join(", ")}<br><br>
+      <strong>⬇️ Exemplo do primeiro registro:</strong><br>
+      ${Object.entries(v).map(([k, val]) => `• ${k}: ${val}`).join("<br>")}`;
+      debugInfo.classList.add('show');
+      
+      // Esconder o debug após 15 segundos
+      setTimeout(() => {
+        debugInfo.classList.remove('show');
+      }, 15000);
+    }
+    
+    let data = v["Data"] || v["data"] || v["DATA"] || "";
+    let fiscal = extrairFiscal(v);
     let kmInicial = parseFloat(v["KM Inicial"] || v["Km Inicial"] || v["KM_INICIAL"] || v["km_inicial"] || 0);
     let kmFinal = parseFloat(v["KM Final"] || v["Km Final"] || v["KM_FINAL"] || v["km_final"] || 0);
-    let observacao = v["Observações"] || v["Observacao"] || v["OBS"] || v["obs"] || "Sem observações";
+    let observacao = v["Observações"] || v["Observacao"] || v["OBS"] || v["obs"] || "";
+    
+    // Coletar exemplos de fiscal encontrado
+    if (fiscal !== "Não informado" && fiscalExemplos.length < 3) {
+      fiscalExemplos.push(fiscal);
+    }
     
     if (!rodovia) continue;
     if (!historicoPorRodovia[rodovia]) historicoPorRodovia[rodovia] = [];
     historicoPorRodovia[rodovia].push({
-      data: data,
+      data: data || "Data não informada",
       fiscal: fiscal,
       kmInicial: kmInicial,
       kmFinal: kmFinal,
-      observacao: observacao
+      observacao: observacao || "Sem observações"
     });
   }
-  console.log("✅ Vistorias processadas:", Object.keys(historicoPorRodovia));
+  
+  if (fiscalExemplos.length > 0) {
+    console.log("👤 Exemplos de fiscais encontrados:", fiscalExemplos);
+    debugInfo.innerHTML += `<br><br><strong>✅ Fiscais detectados:</strong> ${fiscalExemplos.join(", ")}`;
+  } else {
+    console.warn("⚠️ Nenhum fiscal encontrado! Verifique se a coluna tem um dos nomes: Fiscal, Responsável, Inspetor, etc.");
+  }
+  
+  console.log("✅ Vistorias processadas:", Object.keys(historicoPorRodovia).length, "rodovias");
 }
 
 function showLoading(show) {
@@ -954,6 +958,10 @@ async function loadGeo(file) {
 }
 
 async function loadVistoria(file) {
+  // Limpar debug anterior
+  debugInfo.innerHTML = "";
+  debugInfo.classList.remove('show');
+  
   lerExcel(file, async (data, fileName) => {
     vistoriaData = data;
     vistFileName = fileName;
@@ -970,7 +978,7 @@ function mostrarHistorico(rodovia) {
   if (!historico.length) {
     historyContent.innerHTML = `<div class="empty-history">📭 Nenhum registro de vistoria para ${rodovia}</div>`;
   } else {
-    historyContent.innerHTML = historico.map(item => `
+    historyContent.innerHTML = historico.map((item, idx) => `
       <div class="history-item">
         <div class="date">📅 ${item.data}</div>
         <div class="inspector">👤 Fiscal: ${item.fiscal}</div>
@@ -985,7 +993,6 @@ function mostrarHistorico(rodovia) {
 
 closeHistoryBtn.onclick = () => historyModal.classList.remove('show');
 
-// Função para centralizar o mapa em uma rodovia específica
 function centralizarRodovia(rodoviaNome) {
   if (boundsPorRodovia[rodoviaNome]) {
     map.fitBounds(boundsPorRodovia[rodoviaNome], { padding: [50, 50] });
@@ -1006,7 +1013,6 @@ function atualizarStats() {
   statsListDiv.innerHTML = trechos.map(trecho => {
     const s = estatisticasPorTrecho[trecho];
     const cor = s.percentual >= 80 ? '#22c55e' : (s.percentual >= 50 ? '#f59e0b' : '#ef4444');
-    // Extrai o nome da rodovia do trecho (remove o município se existir)
     const nomeRodovia = trecho.split(' - ')[0];
     return `<div class="stat-item" data-rodovia="${nomeRodovia}" style="cursor: pointer;">
       <div style="flex:1;">
@@ -1019,7 +1025,6 @@ function atualizarStats() {
     </div>`;
   }).join('');
   
-  // Adiciona evento de clique em cada item da estatística
   document.querySelectorAll('.stat-item').forEach(item => {
     item.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1031,7 +1036,6 @@ function atualizarStats() {
   });
 }
 
-// Função para criar o ícone da rodovia
 function criarIconeRodovia(rodoviaNome, municipio) {
   const hasMunicipio = municipio && municipio.trim() !== '';
   
@@ -1052,6 +1056,84 @@ function criarIconeRodovia(rodoviaNome, municipio) {
     iconAnchor: [width / 2, height / 2],
     popupAnchor: [0, -height / 2]
   });
+}
+
+function converterCoordenada(coord) {
+  if (!coord) return null;
+  
+  let str = String(coord).trim();
+  
+  if (str.toLowerCase().includes('inexistente')) return null;
+  
+  const dmsMatch = str.match(/(\d+)°\s*(\d+)'([\d.]+)"([NSWE])/i);
+  if (dmsMatch) {
+    let dec = parseFloat(dmsMatch[1]) + parseFloat(dmsMatch[2])/60 + parseFloat(dmsMatch[3])/3600;
+    if (dmsMatch[4].toUpperCase() === 'S' || dmsMatch[4].toUpperCase() === 'W') dec *= -1;
+    return dec;
+  }
+  
+  let numeroInteiro = parseFloat(str.replace(/[^0-9.-]/g, ''));
+  if (!isNaN(numeroInteiro)) {
+    let strNumero = Math.abs(numeroInteiro).toString();
+    
+    if (strNumero.length >= 8 && strNumero.length <= 9) {
+      let parteInteira = strNumero.substring(0, 2);
+      let parteDecimal = strNumero.substring(2);
+      let convertido = parseFloat(parteInteira + '.' + parteDecimal);
+      let sinal = numeroInteiro < 0 ? -1 : 1;
+      let resultado = sinal * convertido;
+      
+      if (Math.abs(resultado) <= 90 && !str.includes('Long')) {
+        return resultado;
+      }
+      if (Math.abs(resultado) <= 180) {
+        return resultado;
+      }
+    }
+  }
+  
+  let temp = str;
+  temp = temp.replace(',', '.');
+  
+  let parts = temp.split('.');
+  if (parts.length > 2) {
+    let last = parts.pop();
+    let first = parts.join('');
+    temp = first + '.' + last;
+  }
+  
+  let num = parseFloat(temp);
+  return isNaN(num) ? null : num;
+}
+
+async function salvarGeoFirebase(data, fileName) {
+  if (!firebaseInitialized) { localStorage.setItem('geoData', JSON.stringify({ data, fileName })); return; }
+  try { await db.collection('mapa_vistorias').doc('geo_data').set({ data, fileName, timestamp: new Date() }); }
+  catch(e) { localStorage.setItem('geoData', JSON.stringify({ data, fileName })); }
+}
+
+async function salvarVistoriaFirebase(data, fileName) {
+  if (!firebaseInitialized) { localStorage.setItem('vistoriaData', JSON.stringify({ data, fileName })); return; }
+  try { await db.collection('mapa_vistorias').doc('vistoria_data').set({ data, fileName, timestamp: new Date() }); }
+  catch(e) { localStorage.setItem('vistoriaData', JSON.stringify({ data, fileName })); }
+}
+
+async function carregarGeoFirebase() {
+  if (firebaseInitialized) {
+    try { const doc = await db.collection('mapa_vistorias').doc('geo_data').get(); if (doc.exists) return doc.data(); }
+    catch(e) {}
+  }
+  const local = localStorage.getItem('geoData');
+  return local ? JSON.parse(local) : null;
+}
+
+async function carregarVistoriaFirebase() {
+  if (firebaseInitialized) {
+    try { const doc = await db.collection('mapa_vistorias').doc('vistoria_data').get(); if (doc.exists) return doc.data(); }
+    catch(e) {}
+  }
+  const local = localStorage.getItem('vistoriaData');
+  return local ? JSON.parse(local) : null;
 }
 
 function desenhar() {
@@ -1104,18 +1186,15 @@ function desenhar() {
     const pts = pontosPorTrecho[nome].sort((a,b) => a.km - b.km);
     const coords = pts.map(p => [p.lat, p.lng]);
     
-    // Guarda os bounds desta rodovia para centralização futura
     if (coords.length > 0) {
       const rodoviaBounds = L.latLngBounds(coords);
       boundsPorRodovia[pts[0].rodoviaOriginal] = rodoviaBounds;
     }
     
-    // Linha azul de referência
     const linha = L.polyline(coords, { color: "#0044ff", weight: 6, opacity: 1, smoothFactor: 1 }).addTo(map);
     todasAsLinhas.push(linha);
     coords.forEach(c => bounds.push(c));
     
-    // Marcador no meio da rodovia
     if (pts.length) {
       const meio = Math.floor(pts.length / 2);
       const icon = criarIconeRodovia(pts[meio].rodoviaOriginal, pts[meio].municipio);
@@ -1124,7 +1203,6 @@ function desenhar() {
       marcadoresRodovia.push(marker);
     }
     
-    // Segmentos
     for (let i = 0; i < pts.length - 1; i++) {
       novosSegmentos.push({
         nomeTrecho: nome,
@@ -1210,14 +1288,12 @@ function toggleMap() {
   if (isMobile) closeSidebar();
 }
 
-// Eventos
 fabButton.addEventListener("click", (e) => { e.stopPropagation(); fabMenu.classList.toggle("show"); });
 document.addEventListener("click", (e) => { if (!fabButton.contains(e.target) && !fabMenu.contains(e.target)) fabMenu.classList.remove("show"); });
 fabMapToggle.addEventListener("click", toggleMap);
 setupInput("geoDrop", "geoInput", loadGeo);
 setupInput("vistDrop", "vistInput", loadVistoria);
 
-// Carregar dados salvos
 async function carregarDados() {
   showLoading(true);
   const geo = await carregarGeoFirebase();
@@ -1240,7 +1316,7 @@ async function carregarDados() {
 }
 
 carregarDados();
-console.log("✅ Sistema 100% funcional! Clique nos trechos para centralizar o mapa.");
+console.log("✅ Sistema 100% funcional!");
 </script>
 </body>
 </html>
